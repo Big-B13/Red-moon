@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Omertà: The Five Boroughs, 1955</title>
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0c0a08; color: #e9dcc0;
+  font-family: Georgia, 'Times New Roman', serif; user-select: none; -webkit-user-select: none; }
+canvas#map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+canvas#map.dragging { cursor: grabbing; }
+.panel { position: absolute; background: linear-gradient(180deg, rgba(28,22,16,.94), rgba(18,14,10,.94));
+  border: 1px solid #6e5a34; box-shadow: 0 6px 24px rgba(0,0,0,.6), inset 0 0 0 1px rgba(0,0,0,.6); border-radius: 4px; }
+.panel h3 { margin: 0; padding: 7px 10px 6px; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: #c9a45c; border-bottom: 1px solid #3d3120; font-weight: normal; display: flex; justify-content: space-between; align-items: center; }
+.panel h3 small { letter-spacing: .05em; color: #8c7a58; text-transform: none; font-style: italic; }
+.hidden { display: none !important; }
+
+/* top bar */
+#top { top: 8px; left: 50%; transform: translateX(-50%); display: flex; align-items: stretch; height: 46px; padding: 0 4px; white-space: nowrap; }
+#top .logo { font-size: 20px; letter-spacing: .18em; color: #d9b25f; padding: 0 14px 0 10px; display: flex; flex-direction: column; justify-content: center;
+  border-right: 1px solid #3d3120; font-weight: bold; line-height: 1; }
+#top .logo small { font-size: 8.5px; letter-spacing: .3em; color: #8c7a58; font-weight: normal; margin-top: 3px; }
+.stat { padding: 0 13px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #3d3120; min-width: 86px; }
+.stat .l { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #8c7a58; }
+.stat .v { font-size: 16px; font-variant-numeric: tabular-nums; }
+.stat .v small { font-size: 11px; color: #9fbf7a; }
+.heatbar { width: 90px; height: 7px; background: #2a2118; border: 1px solid #4a3b26; margin-top: 4px; position: relative; }
+.heatbar i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg,#c9a45c,#d4572a,#ff2a2a); }
+.heatbar b { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: #8c7a58; }
+.heatbar b.b2 { left: 80%; background: #ff5a4a; }
+#top .ctl { display: flex; align-items: center; gap: 4px; padding: 0 8px; }
+button { font-family: inherit; }
+.btn { background: #2a2016; color: #e9dcc0; border: 1px solid #6e5a34; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
+.btn:hover { background: #3a2c1c; border-color: #c9a45c; }
+.btn.on { background: #6b1d17; border-color: #e0644f; }
+.btn[disabled], .btn.dis { opacity: .4; cursor: not-allowed; }
+
+/* left panel */
+#left { top: 62px; left: 8px; width: 262px; bottom: 8px; overflow-y: auto; }
+#left::-webkit-scrollbar, #right::-webkit-scrollbar { width: 6px; } 
+#left::-webkit-scrollbar-thumb, #right::-webkit-scrollbar-thumb { background: #4a3b26; }
+.sec { padding: 6px 8px 8px; }
+.crew { display: flex; gap: 8px; align-items: center; padding: 5px 6px; margin-bottom: 4px; background: rgba(0,0,0,.25); border: 1px solid #3a2e1e; border-radius: 3px; }
+.crew .ic { font-size: 20px; width: 26px; text-align: center; }
+.crew .nm { font-size: 12.5px; }
+.crew .nm i { color: #d9b25f; }
+.crew .ds { font-size: 10.5px; color: #9d8b68; }
+.crew.empty { color: #6f604a; font-style: italic; font-size: 12px; justify-content: center; border-style: dashed; }
+.cand { display: flex; gap: 6px; align-items: center; padding: 4px 6px; font-size: 11.5px; border-bottom: 1px dotted #3a2e1e; }
+.cand .ic { font-size: 16px; }
+.cand .grow { flex: 1; line-height: 1.2; }
+.cand .grow span { color: #9d8b68; font-size: 10.5px; }
+.bgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.bbtn { text-align: left; padding: 6px 7px; line-height: 1.2; position: relative; }
+.bbtn .ic { font-size: 17px; float: left; margin-right: 6px; }
+.bbtn .nm { font-size: 12px; display: block; }
+.bbtn .cs { font-size: 11px; color: #d9b25f; }
+.bbtn kbd, .op kbd { position: absolute; right: 4px; top: 3px; font-size: 9px; color: #8c7a58; font-family: inherit; }
+.op { width: 100%; text-align: left; padding: 6px 8px; margin-bottom: 5px; display: flex; gap: 8px; align-items: center; position: relative; }
+.op .ic { font-size: 17px; }
+.op .nm { font-size: 12.5px; }
+.op .ds { font-size: 10.5px; color: #9d8b68; }
+.ring { display: flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 3px 2px; border-bottom: 1px dotted #2e2518; }
+.ring .ic { width: 20px; text-align: center; }
+.ring .grow { flex: 1; }
+.ring .own { font-variant-numeric: tabular-nums; color: #9d8b68; }
+.chip { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; border: 1px solid rgba(0,0,0,.6); }
+.tip { font-size: 10.5px; color: #8c7a58; font-style: italic; }
+
+/* right panel */
+#right { top: 62px; right: 8px; width: 262px; max-height: calc(100% - 290px); overflow-y: auto; }
+.fam { padding: 6px 8px 7px 10px; border-left: 4px solid; border-bottom: 1px solid #2e2518; }
+.fam.me { background: rgba(201,164,92,.08); }
+.fam.dead { opacity: .45; }
+.fam .row { display: flex; justify-content: space-between; align-items: baseline; }
+.fam .nm { font-size: 13.5px; }
+.fam .pc { font-size: 13px; font-variant-numeric: tabular-nums; color: #d9b25f; }
+.fam .sub { font-size: 10.5px; color: #9d8b68; margin-top: 1px; }
+.fam .btns { display: flex; gap: 4px; margin-top: 4px; }
+.fam .btns .btn { font-size: 10.5px; padding: 2px 5px; }
+.tag { font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; padding: 1px 4px; border-radius: 2px; margin-left: 4px; }
+.tag.war { background: #6b1d17; color: #ffd7cc; }
+.tag.peace { background: #2d4a2a; color: #d4f0c8; }
+.offer { padding: 7px 9px; background: #3a2a12; border-bottom: 1px solid #6e5a34; font-size: 12px; }
+.offer .btns { margin-top: 4px; display: flex; gap: 5px; }
+
+/* bottom */
+#bottom { bottom: 8px; left: 50%; transform: translateX(-50%); width: min(520px, calc(100% - 560px)); min-width: 330px; padding: 8px 12px 8px; }
+#bottom .r1 { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+#bottom input[type=range] { flex: 1; accent-color: #a3161a; }
+#ratioLbl { min-width: 150px; text-align: right; font-variant-numeric: tabular-nums; }
+#hint { font-size: 11.5px; color: #b9a67f; margin-top: 5px; text-align: center; font-style: italic; min-height: 15px; }
+#attacks { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; justify-content: center; }
+#attacks .atk { font-size: 10.5px; background: rgba(0,0,0,.3); border: 1px solid #4a3b26; border-radius: 3px; padding: 2px 3px 2px 6px; display: flex; gap: 5px; align-items: center; }
+#attacks .atk.in { border-color: #a3161a; background: rgba(107,29,23,.35); }
+#attacks .atk .btn { font-size: 10px; padding: 1px 4px; }
+
+/* newspaper */
+#news { right: 8px; bottom: 8px; width: 262px; height: 214px; background: linear-gradient(180deg,#e8dcc0,#d8c9a4); color: #1d160e; border-color: #8a7449; overflow: hidden; }
+#news h3 { color: #1d160e; border-bottom: 3px double #1d160e; justify-content: center; font-size: 15px; letter-spacing: .12em; font-weight: bold; font-family: 'Times New Roman', Georgia, serif; padding: 5px; }
+#news .dateline { text-align: center; font-size: 9px; letter-spacing: .2em; border-bottom: 1px solid #1d160e; padding: 2px; text-transform: uppercase; }
+#newsList { padding: 3px 8px; font-size: 11.5px; line-height: 1.25; }
+#newsList div { padding: 3px 0; border-bottom: 1px solid rgba(29,22,14,.2); }
+#newsList div b { font-weight: normal; color: #6d5b3c; font-size: 10px; margin-right: 4px; font-variant-numeric: tabular-nums; }
+#newsList .bad { color: #8a1010; }
+#newsList .good { color: #1f4d1a; }
+#newsList .war { color: #7a3d00; }
+#newsList .major { font-weight: bold; }
+
+/* tooltip, toasts, banners */
+#tooltip { position: absolute; pointer-events: none; background: rgba(12,10,8,.94); border: 1px solid #6e5a34; padding: 6px 9px; font-size: 11.5px;
+  border-radius: 3px; max-width: 240px; line-height: 1.35; z-index: 30; }
+#tooltip .t { color: #d9b25f; font-size: 12.5px; }
+#toasts { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none; z-index: 40; }
+.toast { background: rgba(20,14,10,.95); border: 1px solid #a3161a; color: #f3e6c8; padding: 6px 14px; font-size: 13px; border-radius: 3px; animation: fade 2.6s forwards; }
+.toast.ok { border-color: #6e8a45; }
+@keyframes fade { 0% { opacity: 0; transform: translateY(-6px);} 8% { opacity: 1; transform: none;} 80% { opacity: 1;} 100% { opacity: 0; } }
+#warn { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); margin-top: 0; background: #6b1d17; border: 1px solid #ff6a50; color: #fff0e0;
+  padding: 6px 14px; font-size: 13px; border-radius: 3px; animation: pulse 1s infinite alternate; z-index: 35; white-space: nowrap; }
+@keyframes pulse { from { box-shadow: 0 0 0 rgba(255,60,40,0);} to { box-shadow: 0 0 18px rgba(255,60,40,.8);} }
+#spawnBar { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); padding: 12px 18px; text-align: center; z-index: 20; }
+#spawnBar .big { font-size: 17px; color: #d9b25f; letter-spacing: .05em; }
+#spawnBar .sm { font-size: 12px; color: #9d8b68; margin-top: 3px; font-style: italic; }
+#spawnBar .btn { margin-top: 8px; font-size: 14px; padding: 6px 18px; background: #6b1d17; border-color: #e0644f; }
+
+/* overlays */
+.overlay { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(12,10,8,.72), rgba(0,0,0,.94)); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.card { width: min(620px, 94vw); max-height: 94vh; overflow-y: auto; padding: 26px 32px 24px; position: relative; text-align: center; }
+.card h1 { margin: 0; font-size: 50px; letter-spacing: .2em; color: #d9b25f; font-weight: bold; text-shadow: 0 2px 0 #000; }
+.card .sub { letter-spacing: .4em; font-size: 11px; color: #8c7a58; text-transform: uppercase; margin-top: 2px; }
+.card .quote { font-style: italic; color: #b9a67f; margin: 16px auto 18px; font-size: 14px; max-width: 460px; }
+.card label { display: block; font-size: 10px; letter-spacing: .25em; text-transform: uppercase; color: #8c7a58; margin: 12px 0 5px; }
+.card input[type=text] { background: #1a140e; border: 1px solid #6e5a34; color: #f3e6c8; font-family: inherit; font-size: 18px; padding: 6px 10px; width: 260px; text-align: center; border-radius: 3px; }
+.swatches { display: flex; gap: 8px; justify-content: center; }
+.swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #2a2016; cursor: pointer; }
+.swatch.on { border-color: #f3e6c8; box-shadow: 0 0 0 2px #c9a45c; }
+.seg { display: inline-flex; border: 1px solid #6e5a34; border-radius: 3px; overflow: hidden; }
+.seg button { background: #1a140e; color: #b9a67f; border: 0; padding: 6px 16px; cursor: pointer; font-size: 13px; border-right: 1px solid #3d3120; }
+.seg button:last-child { border-right: 0; }
+.seg button.on { background: #6b1d17; color: #fff0e0; }
+.go { margin-top: 20px; font-size: 17px; letter-spacing: .15em; text-transform: uppercase; padding: 10px 28px; background: #6b1d17; border: 1px solid #e0644f; color: #fff0e0; cursor: pointer; border-radius: 3px; }
+.go:hover { background: #8a251d; }
+.how { text-align: left; font-size: 12.5px; color: #cdbd9c; line-height: 1.5; margin-top: 18px; border-top: 1px solid #3d3120; padding-top: 12px; }
+.how b { color: #d9b25f; font-weight: normal; }
+.how ul { margin: 4px 0; padding-left: 18px; }
+.stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 18px 0 6px; }
+.stats div { background: rgba(0,0,0,.3); border: 1px solid #3d3120; padding: 8px; }
+.stats b { display: block; font-size: 20px; color: #d9b25f; font-weight: normal; }
+.stats span { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #8c7a58; }
+.x { position: absolute; top: 8px; right: 10px; }
+
+</style>
+</head>
+<body>
+<canvas id="map"></canvas>
+
+<!-- TOP BAR -->
+<div id="top" class="panel hidden">
+  <div class="logo">OMERTÀ<small>NEW YORK · 1955</small></div>
+  <div class="stat"><span class="l">Cash</span><span class="v" id="sCash">$0</span></div>
+  <div class="stat"><span class="l">Soldiers</span><span class="v" id="sTroops">0</span></div>
+  <div class="stat"><span class="l">Territory</span><span class="v" id="sTerr">0%</span></div>
+  <div class="stat"><span class="l">Heat <span id="sHeatN"></span></span><div class="heatbar"><i id="sHeat"></i><b></b><b class="b2"></b></div></div>
+  <div class="stat"><span class="l">Clock</span><span class="v" id="sTime">0:00</span></div>
+  <div class="ctl">
+    <button class="btn" id="bPause" title="Pause (Space)">❚❚</button>
+    <button class="btn" id="bSpeed" title="Game speed">1×</button>
+    <button class="btn" id="bHelp" title="How to play">?</button>
+  </div>
+</div>
+
+<!-- LEFT: family, build, ops, rings -->
+<div id="left" class="panel hidden">
+  <h3>The Family <small id="donName"></small></h3>
+  <div class="sec" id="crewBox"></div>
+  <h3>Recruit a Made Man <small id="candTimer"></small></h3>
+  <div class="sec" id="candBox" style="padding-top:2px"></div>
+  <h3>Build <small>click your turf</small></h3>
+  <div class="sec"><div class="bgrid" id="buildBox"></div></div>
+  <h3>Operations</h3>
+  <div class="sec" id="opsBox"></div>
+  <h3>Crime Rings <small>own every racket of a kind</small></h3>
+  <div class="sec" id="ringBox"></div>
+</div>
+
+<!-- RIGHT: families -->
+<div id="right" class="panel hidden">
+  <div id="offerBox"></div>
+  <h3>The Families <small>share of the city</small></h3>
+  <div id="famBox"></div>
+</div>
+
+<!-- BOTTOM: attack ratio -->
+<div id="bottom" class="panel hidden">
+  <div class="r1">
+    <span>Send</span>
+    <input type="range" id="ratio" min="5" max="100" step="5" value="30">
+    <span id="ratioLbl">30% · 0 soldiers</span>
+  </div>
+  <div id="hint"></div>
+  <div id="attacks"></div>
+</div>
+
+<!-- NEWSPAPER -->
+<div id="news" class="panel hidden">
+  <h3>THE DAILY LEDGER</h3>
+  <div class="dateline" id="dateline">Late City Edition · Five Cents</div>
+  <div id="newsList"></div>
+</div>
+
+<div id="tooltip" class="hidden"></div>
+<div id="toasts"></div>
+<div id="warn" class="hidden"></div>
+
+<div id="spawnBar" class="panel hidden">
+  <div class="big">Where does your family set up shop?</div>
+  <div class="sm">Click any land block to plant your compound. Drag to pan, scroll to zoom. Havana is out there too…</div>
+  <button class="btn hidden" id="bBegin">Begin the war ▸</button>
+</div>
+
+<!-- START -->
+<div id="startOv" class="overlay">
+  <div class="card panel">
+    <h1>OMERTÀ</h1>
+    <div class="sub">The Five Boroughs · 1955</div>
+    <div class="quote">"Keep your friends close, and the other families' rackets closer."</div>
+    <label>Family name</label>
+    <input type="text" id="inName" maxlength="16" value="Russo">
+    <label>Family colours</label>
+    <div class="swatches" id="swatches"></div>
+    <label>Difficulty</label>
+    <div class="seg" id="diffSeg">
+      <button data-d="easy">Soldato</button><button data-d="normal" class="on">Capo</button><button data-d="hard">Don</button>
+    </div>
+    <div><button class="go" id="bStart">Choose your turf ▸</button></div>
+    <div class="how" id="howText"></div>
+  </div>
+</div>
+
+<!-- HELP -->
+<div id="helpOv" class="overlay hidden">
+  <div class="card panel">
+    <button class="btn x" id="bHelpClose">✕</button>
+    <h1 style="font-size:30px">HOW IT WORKS</h1>
+    <div class="how" id="howText2"></div>
+  </div>
+</div>
+
+<!-- END -->
+<div id="endOv" class="overlay hidden">
+  <div class="card panel">
+    <h1 id="endTitle" style="font-size:36px"></h1>
+    <div class="quote" id="endReason"></div>
+    <div class="stats" id="endStats"></div>
+    <button class="go" id="bAgain">Play again</button>
+  </div>
+</div>
+
+<script>
+// ============================================================================
+//  OMERTÀ: THE FIVE BOROUGHS — game engine (no DOM; runs in browser or node)
+// ============================================================================
+const Engine = (function () {
+  'use strict';
+  const W = 220, H = 140, N = W * H;
+  const WATER = 0, LAND = 1, BRIDGE = 2;
+  const TICK = 0.1; // seconds per simulation tick
+
+  // ---------------------------------------------------------------- data ---
+  const RACKETS = {
+    numbers: { name: 'Numbers Racket', icon: '🎲', income: 5, ring: '+20% income' },
+    loan:    { name: 'Loan Sharking',  icon: '💵', income: 8, ring: 'Buildings 25% cheaper' },
+    club:    { name: 'Nightclub',      icon: '🍸', income: 10, ring: '+25% soldier recruitment' },
+    union:   { name: 'Dock Union',     icon: '⚓', income: 9, ring: 'Your turf is 30% harder to take' },
+    casino:  { name: 'Casino',         icon: '🎰', income: 22, ring: '+$60/s skim' },
+    narco:   { name: 'Narcotics',      icon: '💊', income: 28, heat: 0.08, ring: '+20% attack power (but double heat)' },
+  };
+  const BUILDINGS = {
+    safehouse: { name: 'Safehouse',      icon: '🏚️', cost: 400, key: 'Q', desc: '+2,000 max soldiers' },
+    front:     { name: 'Front Business', icon: '🏪', cost: 500, key: 'W', desc: '+$10/s laundered income' },
+    guard:     { name: 'Guard Post',     icon: '🛡️', cost: 300, key: 'E', desc: 'Turf within 8 blocks is 2.5× harder to take' },
+    docks:     { name: 'Docks',          icon: '⛴️', cost: 600, key: 'R', desc: 'Send boats across water. Must touch water.' },
+  };
+  const SPECS = {
+    bruiser:     { name: 'Bruiser',     icon: '👊', desc: 'Attacks cost 15% fewer soldiers' },
+    arsonist:    { name: 'Arsonist',    icon: '🔥', desc: 'Unlocks Firebomb' },
+    safecracker: { name: 'Safecracker', icon: '🔓', desc: 'Unlocks Heist' },
+    medic:       { name: 'Medic',       icon: '🩺', desc: '+25% soldier recruitment' },
+    engineer:    { name: 'Engineer',    icon: '🔧', desc: 'Buildings 25% cheaper' },
+    consigliere: { name: 'Consigliere', icon: '🎩', desc: 'Bribes ½ price, heat fades 2× faster, better truce odds' },
+  };
+  const NICKS = {
+    bruiser: ['the Bull', 'Knuckles', 'Hammer', 'the Ox', 'Big Paulie'],
+    arsonist: ['Matches', 'Sparky', 'the Torch', 'Smokey'],
+    safecracker: ['Fingers', 'the Ghost', 'Silk', 'Tumblers'],
+    medic: ['Doc', 'Stitches', 'the Priest'],
+    engineer: ['Books', 'the Architect', 'Wrench'],
+    consigliere: ['the Professor', 'Counselor', 'the Fox', 'Two-Tone'],
+  };
+  const FIRST = ['Sal', 'Vito', 'Tommy', 'Frankie', 'Sonny', 'Carmine', 'Paulie', 'Rocco', 'Luca', 'Nicky', 'Joey', 'Aldo', 'Enzo', 'Gino', 'Mario', 'Benny', 'Louie', 'Tony', 'Vinnie', 'Dom', 'Fredo', 'Artie', 'Mikey', 'Ralphie'];
+  const LAST = ['Russo', 'Esposito', 'Bianchi', 'Romano', 'Colombo', 'Ricci', 'Marino', 'Greco', 'Bruno', 'Gallo', 'Conti', 'De Luca', 'Mancini', 'Costa', 'Giordano', 'Rinaldi', 'Lombardi', 'Moretti', 'Fontana', 'Serra'];
+
+  const AI_FAMILIES = [
+    { name: 'Barone',     don: 'Don Emilio Barone',     color: [52, 92, 168] },
+    { name: 'Vitale',     don: 'Don Carlo Vitale',      color: [96, 138, 52] },
+    { name: 'Carbone',    don: 'Don Rocco Carbone',     color: [205, 158, 38] },
+    { name: 'Santangelo', don: 'Don Pietro Santangelo', color: [128, 72, 150] },
+    { name: 'Rizzo',      don: 'Don Vincenzo Rizzo',    color: [36, 146, 146] },
+    { name: 'Delgado',    don: 'Señor Ramón Delgado',   color: [222, 104, 40], havana: true },
+  ];
+
+  const DIFFICULTY = {
+    easy:   { regen: 0.8,  attackAt: 0.72, playerBias: 0.0, think: 2.4 },
+    normal: { regen: 1.0,  attackAt: 0.58, playerBias: 0.25, think: 1.7 },
+    hard:   { regen: 1.2,  attackAt: 0.48, playerBias: 0.6, think: 1.2 },
+  };
+
+  // ---------------------------------------------------------------- map ----
+  // Rough, stylised 1950s New York + Havana (grid units, 220 × 140)
+  const POLYS = {
+    jersey:    [[0, 0], [70, 0], [72, 10], [70, 24], [67, 40], [63, 58], [58, 76], [54, 92], [48, 104], [40, 108], [0, 110]],
+    manhattan: [[76, 6], [82, 3], [86, 10], [85, 24], [81, 42], [76, 62], [71, 78], [67, 86], [63, 84], [64, 74], [68, 58], [72, 40], [75, 22]],
+    bronx:     [[90, 0], [142, 0], [144, 12], [134, 22], [118, 25], [100, 24], [93, 20], [89, 10]],
+    queens:    [[89, 30], [118, 30], [150, 29], [166, 37], [172, 55], [162, 68], [140, 72], [112, 71], [96, 69], [85, 60], [85, 44]],
+    brooklyn:  [[82, 70], [96, 69], [112, 71], [140, 72], [152, 86], [146, 104], [130, 114], [106, 117], [88, 111], [78, 98], [73, 86]],
+    staten:    [[40, 116], [56, 110], [66, 113], [68, 125], [58, 135], [44, 135], [35, 127]],
+    havana:    [[172, 114], [196, 110], [218, 116], [219, 134], [200, 139], [178, 138], [166, 128]],
+  };
+  const BRIDGES = [
+    ['George Washington Bridge', [69, 16], [79, 16]],
+    ['Lincoln Tunnel', [62, 60], [70, 60]],
+    ['Harlem River Bridge', [84, 17], [93, 15]],
+    ['Triborough Bridge', [108, 22], [108, 33]],
+    ['Queensboro Bridge', [79, 49], [89, 49]],
+    ['Brooklyn Bridge', [67, 81], [78, 83]],
+    ['Verrazzano Bridge', [80, 102], [64, 116]],
+    ['Bayonne Bridge', [44, 104], [47, 115]],
+  ];
+  // name, x, y, rackets
+  const DISTRICTS = [
+    ['Paterson', 30, 14, ['loan', 'numbers']],
+    ['Newark', 24, 60, ['narco', 'numbers']],
+    ['Hoboken', 60, 36, ['union', 'numbers']],
+    ['Jersey City', 50, 74, ['union', 'club']],
+    ['Bayonne', 38, 97, ['union']],
+    ['Harlem', 81, 15, ['narco', 'club']],
+    ['Midtown', 77, 40, ['club', 'loan']],
+    ["Hell's Kitchen", 71, 56, ['numbers', 'club']],
+    ['Little Italy', 69, 70, ['loan', 'numbers']],
+    ['Wall Street', 66, 81, ['loan']],
+    ['South Bronx', 100, 15, ['narco', 'numbers']],
+    ['Fordham', 118, 9, ['numbers', 'loan']],
+    ['Pelham', 135, 8, ['numbers']],
+    ['Astoria', 95, 37, ['numbers', 'club']],
+    ['Long Island City', 90, 55, ['union', 'numbers']],
+    ['Flushing', 132, 42, ['loan', 'numbers']],
+    ['Jamaica', 145, 60, ['numbers', 'narco']],
+    ['Bayside', 160, 46, ['numbers']],
+    ['Williamsburg', 95, 78, ['loan', 'numbers']],
+    ['Red Hook Docks', 81, 92, ['union', 'union']],
+    ['Flatbush', 114, 92, ['numbers', 'club']],
+    ['Brownsville', 136, 87, ['narco', 'numbers']],
+    ['Bensonhurst', 94, 106, ['numbers', 'loan']],
+    ['Coney Island', 118, 110, ['club', 'numbers']],
+    ['Staten Island', 52, 124, ['numbers', 'union']],
+    ['Old Havana', 180, 122, ['casino', 'club']],
+    ['Vedado', 198, 124, ['casino', 'casino']],
+    ['Tropicana', 210, 130, ['casino', 'narco']],
+  ];
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function pointInPoly(x, y, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+      if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+  }
+  function makeNoise(rng) {
+    const S = 32, g = new Float32Array(S * S);
+    for (let i = 0; i < g.length; i++) g[i] = rng() * 2 - 1;
+    const sm = t => t * t * (3 - 2 * t);
+    return function (x, y) {
+      const x0 = Math.floor(x), y0 = Math.floor(y), fx = sm(x - x0), fy = sm(y - y0);
+      const v = (a, b) => g[((b & (S - 1)) * S) + (a & (S - 1))];
+      const a = v(x0, y0) + (v(x0 + 1, y0) - v(x0, y0)) * fx;
+      const b = v(x0, y0 + 1) + (v(x0 + 1, y0 + 1) - v(x0, y0 + 1)) * fx;
+      return a + (b - a) * fy;
+    };
+  }
+
+  function buildMap(rng) {
+    const terrain = new Uint8Array(N);
+    const n1 = makeNoise(rng), n2 = makeNoise(rng);
+    const polys = Object.values(POLYS);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const jx = x + 0.5 + n1(x / 7, y / 7) * 2.2 + n1(x / 2.5 + 50, y / 2.5) * 0.6;
+      const jy = y + 0.5 + n2(x / 7, y / 7) * 2.2 + n2(x / 2.5, y / 2.5 + 50) * 0.6;
+      for (const p of polys) if (pointInPoly(jx, jy, p)) { terrain[y * W + x] = LAND; break; }
+    }
+    // bridges
+    const bridges = [];
+    for (const [name, a, b] of BRIDGES) {
+      const dx = b[0] - a[0], dy = b[1] - a[1];
+      const len = Math.hypot(dx, dy), steps = Math.ceil(len * 3);
+      const ux = dx / len, uy = dy / len;
+      const tiles = [];
+      for (let s = -6; s <= steps + 6; s++) {
+        const t = s / steps;
+        const px = a[0] + dx * t, py = a[1] + dy * t;
+        for (const off of [0, 0.7]) {
+          const qx = Math.floor(px - uy * off), qy = Math.floor(py + ux * off);
+          if (qx < 0 || qy < 0 || qx >= W || qy >= H) continue;
+          const i = qy * W + qx;
+          if (terrain[i] === WATER && s >= -2 && s <= steps + 2) { terrain[i] = BRIDGE; tiles.push(i); }
+        }
+      }
+      if (tiles.length) {
+        const mid = tiles[tiles.length >> 1];
+        bridges.push({ name, x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2, mid });
+      }
+    }
+    // remove tiny islands (< 12 tiles)
+    const seen = new Uint8Array(N);
+    for (let i = 0; i < N; i++) {
+      if (terrain[i] === WATER || seen[i]) continue;
+      const comp = [i]; seen[i] = 1;
+      for (let k = 0; k < comp.length; k++) {
+        const c = comp[k], x = c % W, y = (c / W) | 0;
+        const nb = [x > 0 ? c - 1 : -1, x < W - 1 ? c + 1 : -1, y > 0 ? c - W : -1, y < H - 1 ? c + W : -1];
+        for (const j of nb) if (j >= 0 && !seen[j] && terrain[j] !== WATER) { seen[j] = 1; comp.push(j); }
+      }
+      if (comp.length < 12) for (const c of comp) terrain[c] = WATER;
+    }
+    // districts: nearest seed
+    const district = new Uint8Array(N).fill(255);
+    for (let i = 0; i < N; i++) {
+      if (terrain[i] === WATER) continue;
+      const x = i % W, y = (i / W) | 0;
+      let best = 0, bd = 1e9;
+      for (let d = 0; d < DISTRICTS.length; d++) {
+        const dd = (DISTRICTS[d][1] - x) ** 2 + (DISTRICTS[d][2] - y) ** 2;
+        if (dd < bd) { bd = dd; best = d; }
+      }
+      // Havana districts only on Havana island and vice-versa
+      district[i] = best;
+    }
+    return { terrain, district, bridges };
+  }
+
+  // -------------------------------------------------------------- game -----
+  function createGame(opts) {
+    opts = opts || {};
+    const rng = mulberry32(opts.seed || (Math.random() * 1e9) | 0);
+    const { terrain, district, bridges } = buildMap(rng);
+    const diff = DIFFICULTY[opts.difficulty || 'normal'];
+    const G = {
+      W, H, N, WATER, LAND, BRIDGE, RACKETS, BUILDINGS, SPECS,
+      terrain, district, bridges, districts: DISTRICTS.map(d => ({ name: d[0], x: d[1], y: d[2] })),
+      owner: new Uint8Array(N), racketAt: new Int16Array(N).fill(-1), buildingAt: new Array(N).fill(null),
+      coastal: new Uint8Array(N), coastalList: [],
+      rackets: [], buildings: [], fams: [null], attacks: [], boats: [], effects: [], log: [], offers: [],
+      dirty: [], time: 0, tickN: 0, phase: 'spawn', result: null, rings: {}, candidates: [],
+      landCount: 0, rng, diff, nextAttackId: 1, nextBoatId: 1, speed: 1,
+    };
+    const { owner, racketAt, buildingAt, coastal } = G;
+
+    for (let i = 0; i < N; i++) {
+      if (terrain[i] === WATER) continue;
+      G.landCount++;
+      if (terrain[i] === LAND) {
+        const x = i % W, y = (i / W) | 0;
+        if ((x > 0 && terrain[i - 1] === WATER) || (x < W - 1 && terrain[i + 1] === WATER) ||
+            (y > 0 && terrain[i - W] === WATER) || (y < H - 1 && terrain[i + W] === WATER)) { coastal[i] = 1; G.coastalList.push(i); }
+      }
+    }
+
+    // ---- helpers
+    function nbrs(i, out) {
+      const x = i % W; let n = 0;
+      if (x > 0) out[n++] = i - 1;
+      if (x < W - 1) out[n++] = i + 1;
+      if (i >= W) out[n++] = i - W;
+      if (i < N - W) out[n++] = i + W;
+      return n;
+    }
+    const NB = new Int32Array(4), NB2 = new Int32Array(4);
+    const pick = arr => arr[(rng() * arr.length) | 0];
+    const dist2 = (a, b) => { const dx = a % W - b % W, dy = ((a / W) | 0) - ((b / W) | 0); return dx * dx + dy * dy; };
+    G.isHavana = i => (i % W) > 160 && ((i / W) | 0) > 106;
+
+    // ---- rackets
+    DISTRICTS.forEach((d, di) => {
+      const tiles = [];
+      for (let i = 0; i < N; i++) if (district[i] === di && terrain[i] === LAND && !coastal[i]) tiles.push(i);
+      for (const type of d[3]) {
+        for (let tries = 0; tries < 60 && tiles.length; tries++) {
+          const i = pick(tiles);
+          if (G.rackets.some(r => dist2(r.i, i) < 25)) continue;
+          racketAt[i] = G.rackets.length;
+          G.rackets.push({ i, type, raidedUntil: 0, district: d[0] });
+          break;
+        }
+      }
+    });
+
+    // ---- families
+    function makeFam(id, def, isPlayer) {
+      return {
+        id, name: def.name, don: def.don, color: def.color, isPlayer, havana: !!def.havana,
+        alive: true, troops: 0, maxTroops: 600, cash: 500, tiles: 0, compound: -1,
+        crew: [], spec: {}, heat: 0, truces: {}, grudge: {}, cool: { firebomb: 0, heist: 0, hit: 0, truce: 0, relocate: 0 },
+        bcount: { safehouse: 0, front: 0, guard: 0, docks: 0 }, income: 0, regen: 0,
+        racketCount: 0, nextThink: 0, nextRaid: 0, labelX: 0, labelY: 0, stats: { tilesTaken: 0, peak: 0 },
+      };
+    }
+    const pname = (opts.playerName || 'Russo').trim().slice(0, 18) || 'Russo';
+    const player = makeFam(1, { name: pname, don: 'Don ' + pname, color: opts.playerColor || [178, 34, 34] }, true);
+    G.fams.push(player);
+    G.player = player;
+    AI_FAMILIES.forEach((def, k) => {
+      let d = def;
+      if (opts.playerColor && def.color.join() === opts.playerColor.join()) d = Object.assign({}, def, { color: [178, 34, 34] });
+      const f = makeFam(k + 2, d, false);
+      f.ai = { ratio: 0.35 + rng() * 0.2, attackAt: diff.attackAt + (rng() - 0.5) * 0.1 };
+      G.fams.push(f);
+    });
+
+    function updateSpecs(F) {
+      F.spec = {};
+      for (const c of F.crew) F.spec[c.spec] = (F.spec[c.spec] || 0) + 1;
+    }
+
+    function addLog(text, kind, relevant) {
+      G.log.push({ t: G.time, text, kind: kind || 'info', relevant: relevant !== false });
+      if (G.log.length > 80) G.log.shift();
+    }
+    G.addLog = addLog;
+
+    // ---- ownership
+    function setOwner(i, o) {
+      const old = owner[i];
+      if (old === o) return;
+      if (old) G.fams[old].tiles--;
+      if (o) { G.fams[o].tiles++; G.fams[o].stats.tilesTaken++; }
+      owner[i] = o;
+      G.dirty.push(i);
+    }
+    function blob(center, fid, radius) {
+      const q = [center], depth = new Map([[center, 0]]);
+      for (let k = 0; k < q.length; k++) {
+        const c = q[k], d = depth.get(c);
+        if (owner[c] === 0) setOwner(c, fid);
+        if (d >= radius) continue;
+        const n = nbrs(c, NB);
+        for (let m = 0; m < n; m++) {
+          const j = NB[m];
+          if (terrain[j] !== LAND || depth.has(j) || owner[j] !== 0) continue;
+          if (dist2(j, center) > radius * radius) continue;
+          depth.set(j, d + 1); q.push(j);
+        }
+      }
+    }
+    function validSpawn(i, minDist) {
+      if (terrain[i] !== LAND || owner[i] !== 0 || racketAt[i] >= 0) return false;
+      for (let f = 1; f < G.fams.length; f++) {
+        const F = G.fams[f];
+        if (F.compound >= 0 && dist2(F.compound, i) < minDist * minDist) return false;
+      }
+      for (const r of G.rackets) if (dist2(r.i, i) < 9) return false;
+      return true;
+    }
+    G.canSpawnAt = i => i >= 0 && i < N && terrain[i] === LAND && racketAt[i] < 0;
+    G.placePlayer = function (i) {
+      if (!G.canSpawnAt(i) || G.phase !== 'spawn') return false;
+      // clear previous
+      if (player.compound >= 0) for (let k = 0; k < N; k++) if (owner[k] === 1) setOwner(k, 0);
+      player.compound = i;
+      blob(i, 1, 5);
+      return true;
+    };
+
+    G.start = function () {
+      if (player.compound < 0) return false;
+      for (let f = 2; f < G.fams.length; f++) {
+        const F = G.fams[f];
+        let placed = false;
+        for (let md = 30; md >= 8 && !placed; md -= 4) {
+          for (let tries = 0; tries < 400; tries++) {
+            const i = (rng() * N) | 0;
+            if (F.havana !== G.isHavana(i)) continue;
+            if (validSpawn(i, F.havana ? Math.min(md, 14) : md)) { F.compound = i; blob(i, F.id, 5); placed = true; break; }
+          }
+        }
+        if (!placed) F.alive = false;
+      }
+      for (let f = 1; f < G.fams.length; f++) {
+        const F = G.fams[f];
+        recalc(F);
+        F.troops = 700;
+        F.nextThink = 2 + rng() * 2;
+      }
+      refreshCandidates();
+      G.phase = 'play';
+      addLog(`The ${player.name} family plants its flag in ${G.districts[district[player.compound]].name}. The other families take notice.`, 'major');
+      return true;
+    };
+
+    // ---- economy
+    function recalc(F) {
+      F.maxTroops = 500 + F.tiles * 5 + F.bcount.safehouse * 2000;
+    }
+    function buildCost(F, type) {
+      let c = BUILDINGS[type].cost * (1 + 0.5 * F.bcount[type]);
+      if (F.spec.engineer) c *= 0.75;
+      if (G.rings.loan === F.id) c *= 0.75;
+      return Math.round(c);
+    }
+    function recruitCost(F) { return Math.round(700 * (1 + 0.6 * F.crew.length)); }
+    function bribeCost(F) { return Math.round((200 + F.heat * 12) * (F.spec.consigliere ? 0.5 : 1)); }
+    function hitCost(F) { return 600; }
+    const FIREBOMB_COST = 900, FIREBOMB_CD = 45, HEIST_CD = 60, HIT_CD = 20;
+    G.buildCost = buildCost; G.recruitCost = recruitCost; G.bribeCost = bribeCost; G.hitCost = hitCost;
+    G.FIREBOMB_COST = FIREBOMB_COST;
+
+    function econTick(F, dt) {
+      recalc(F);
+      const p = F.troops / F.maxTroops;
+      let r = F.maxTroops * 0.03 * (4 * Math.max(p, 0.1) * (1 - Math.min(p, 1)));
+      r += 2;
+      if (F.spec.medic) r *= 1 + 0.25 * F.spec.medic;
+      if (G.rings.club === F.id) r *= 1.25;
+      if (!F.isPlayer) r *= diff.regen;
+      if (p >= 1) r = 0;
+      F.regen = r;
+      F.troops = Math.min(F.maxTroops, F.troops + r * dt);
+      if (F.troops > F.maxTroops) F.troops -= (F.troops - F.maxTroops) * 0.2 * dt;
+
+      let inc = F.tiles * 0.02 + F.bcount.front * 10;
+      let narco = 0;
+      for (const rk of G.rackets) {
+        if (owner[rk.i] !== F.id || rk.raidedUntil > G.time) continue;
+        inc += RACKETS[rk.type].income;
+        if (rk.type === 'narco') narco++;
+      }
+      if (G.rings.numbers === F.id) inc *= 1.2;
+      if (G.rings.casino === F.id) inc += 60;
+      if (F.heat > 50) inc *= 0.75;
+      if (!F.isPlayer) inc *= (0.85 + diff.regen * 0.15);
+      F.income = inc;
+      F.cash += inc * dt;
+
+      addHeat(F, narco * 0.08 * dt);
+      F.heat = Math.max(0, F.heat - (F.spec.consigliere ? 0.7 : 0.35) * dt);
+      F.stats.peak = Math.max(F.stats.peak, F.tiles);
+    }
+    function addHeat(F, h) {
+      if (G.rings.narco === F.id) h *= 2;
+      F.heat = Math.min(100, F.heat + h);
+    }
+
+    function secondTick() {
+      // building counts
+      for (let f = 1; f < G.fams.length; f++) G.fams[f].bcount = { safehouse: 0, front: 0, guard: 0, docks: 0 };
+      for (const b of G.buildings) { const o = owner[b.i]; if (o) G.fams[o].bcount[b.type]++; }
+      // racket counts + rings
+      for (let f = 1; f < G.fams.length; f++) G.fams[f].racketCount = 0;
+      const byType = {};
+      for (const rk of G.rackets) {
+        const o = owner[rk.i];
+        if (o) G.fams[o].racketCount++;
+        (byType[rk.type] = byType[rk.type] || []).push(o);
+      }
+      for (const t in byType) {
+        const os = byType[t];
+        const holder = os.every(o => o && o === os[0]) ? os[0] : 0;
+        if (holder !== (G.rings[t] || 0)) {
+          if (holder) addLog(`${G.fams[holder].name.toUpperCase()} FAMILY CORNERS THE ${RACKETS[t].name.toUpperCase()} RING! (${RACKETS[t].ring})`, 'major');
+          else if (G.rings[t]) addLog(`The ${G.fams[G.rings[t]].name} family loses its grip on the ${RACKETS[t].name} ring.`, G.rings[t] === 1 ? 'bad' : 'info', G.rings[t] === 1);
+          G.rings[t] = holder;
+        }
+      }
+      // police raids
+      for (let f = 1; f < G.fams.length; f++) {
+        const F = G.fams[f];
+        if (!F.alive) continue;
+        if (F.heat >= 80 && G.time >= F.nextRaid) {
+          F.nextRaid = G.time + 15;
+          const mine = G.rackets.filter(r => owner[r.i] === F.id && r.raidedUntil <= G.time);
+          F.troops *= 0.9;
+          if (mine.length) {
+            const r = pick(mine);
+            r.raidedUntil = G.time + 30;
+            addLog(`POLICE RAID! Cops shut down the ${F.name} ${RACKETS[r.type].name} in ${r.district}.`, F.isPlayer ? 'bad' : 'info', F.isPlayer);
+          } else addLog(`Police sweep hits ${F.name} soldiers on the street.`, F.isPlayer ? 'bad' : 'info', F.isPlayer);
+        }
+        // labels
+        let sx = 0, sy = 0, n = 0;
+        for (let i = 0; i < N; i += 1) if (owner[i] === f) { sx += i % W; sy += (i / W) | 0; n++; }
+        if (n) {
+          const cx = sx / n, cy = sy / n;
+          // snap to nearest owned tile
+          let best = -1, bd = 1e9;
+          const R = 30;
+          for (let y = Math.max(0, Math.floor(cy - R)); y < Math.min(H, cy + R); y++)
+            for (let x = Math.max(0, Math.floor(cx - R)); x < Math.min(W, cx + R); x++) {
+              const i = y * W + x;
+              if (owner[i] !== f) continue;
+              const d = (x - cx) ** 2 + (y - cy) ** 2;
+              if (d < bd) { bd = d; best = i; }
+            }
+          if (best >= 0) { F.labelX = best % W + 0.5; F.labelY = ((best / W) | 0) + 0.5; }
+          else { F.labelX = F.compound % W; F.labelY = (F.compound / W) | 0; }
+        }
+      }
+      // offers expire
+      G.offers = G.offers.filter(o => o.expires > G.time && G.fams[o.from].alive);
+      // candidates refresh
+      if (G.time >= G.candRefresh) refreshCandidates();
+      checkEnd();
+    }
+
+    // ---- crew
+    function makeCandidate(spec) {
+      spec = spec || pick(Object.keys(SPECS));
+      return { name: pick(FIRST), nick: pick(NICKS[spec]), last: pick(LAST), spec };
+    }
+    function refreshCandidates() {
+      const specs = Object.keys(SPECS).sort(() => rng() - 0.5).slice(0, 3);
+      G.candidates = specs.map(s => makeCandidate(s));
+      G.candRefresh = G.time + 90;
+    }
+    G.refreshCandidates = refreshCandidates;
+    G.recruit = function (F, idx) {
+      if (F.crew.length >= 4) return 'Your crew is full (4 made men).';
+      const c = recruitCost(F);
+      if (F.cash < c) return 'Not enough cash.';
+      const cand = F.isPlayer ? G.candidates[idx] : makeCandidate();
+      if (!cand) return 'No candidate.';
+      F.cash -= c;
+      F.crew.push(cand);
+      updateSpecs(F);
+      if (F.isPlayer) {
+        G.candidates.splice(idx, 1);
+        if (!G.candidates.length) refreshCandidates();
+        addLog(`${cand.name} "${cand.nick}" ${cand.last} gets his button. Welcome to the family, ${SPECS[cand.spec].name.toLowerCase()}.`, 'good');
+      }
+      return true;
+    };
+
+    // ---- buildings
+    G.canBuild = function (F, type, i) {
+      if (i < 0 || i >= N) return 'Invalid spot.';
+      if (owner[i] !== F.id) return 'You can only build on your own turf.';
+      if (terrain[i] !== LAND) return 'Can\'t build on a bridge.';
+      if (buildingAt[i] || racketAt[i] >= 0 || F.compound === i) return 'That block is taken.';
+      if (type === 'docks' && !coastal[i]) return 'Docks must be built on the waterfront.';
+      for (const b of G.buildings) if (dist2(b.i, i) < 5) return 'Too close to another building.';
+      if (F.cash < buildCost(F, type)) return 'Not enough cash.';
+      return true;
+    };
+    G.build = function (F, type, i) {
+      const ok = G.canBuild(F, type, i);
+      if (ok !== true) return ok;
+      F.cash -= buildCost(F, type);
+      const b = { i, type };
+      G.buildings.push(b);
+      buildingAt[i] = b;
+      F.bcount[type]++;
+      G.dirty.push(i);
+      if (F.isPlayer) addLog(`New ${BUILDINGS[type].name.toLowerCase()} opens in ${G.districts[district[i]].name}.`, 'good');
+      return true;
+    };
+    function destroyBuilding(b) {
+      G.buildings.splice(G.buildings.indexOf(b), 1);
+      buildingAt[b.i] = null;
+      G.dirty.push(b.i);
+    }
+
+    // ---- combat
+    G.isTruce = (a, b) => a && b && (G.fams[a].truces[b] || 0) > G.time;
+    function guardMult(D, i) {
+      for (const b of G.buildings) {
+        if (b.type !== 'guard' || owner[b.i] !== D.id) continue;
+        if (dist2(b.i, i) <= 64) return 2.5;
+      }
+      return 1;
+    }
+    function tileCost(A, D, i) {
+      let c;
+      if (!D) { c = racketAt[i] >= 0 ? 40 : 2.5; }
+      else {
+        const dens = D.troops / Math.max(1, D.tiles);
+        c = 2 + dens * 1.5;
+        if (racketAt[i] >= 0) c *= 2;
+        if (i === D.compound) c = 300 + Math.max(D.troops, D.maxTroops * 0.7) * 0.8;
+        else if (dist2(i, D.compound) <= 9) c *= 2.5;
+        c *= guardMult(D, i);
+        if (G.rings.union === D.id) c *= 1.3;
+      }
+      if (terrain[i] === BRIDGE) c *= 2.5;
+      let atk = 1 - 0.15 * (A.spec.bruiser || 0);
+      if (G.rings.narco === A.id) atk *= 0.8;
+      return c * Math.max(0.5, atk);
+    }
+    G.tileCost = tileCost;
+    function adjacentTo(i, fid) {
+      const n = nbrs(i, NB2);
+      for (let m = 0; m < n; m++) if (owner[NB2[m]] === fid) return true;
+      return false;
+    }
+    function computeFrontier(a, d) {
+      const s = new Set();
+      for (let i = 0; i < N; i++) {
+        if (owner[i] !== d || terrain[i] === WATER) continue;
+        if (adjacentTo(i, a)) s.add(i);
+      }
+      return s;
+    }
+    G.borders = function (a, d) {
+      for (let i = 0; i < N; i++) if (owner[i] === d && terrain[i] !== WATER && adjacentTo(i, a)) return true;
+      return false;
+    };
+
+    G.launchAttack = function (F, d, troops) {
+      if (!F.alive || d === F.id) return 'Invalid target.';
+      if (d && !G.fams[d].alive) return 'That family is finished.';
+      if (d && G.isTruce(F.id, d)) return `You have a truce with the ${G.fams[d].name} family.`;
+      troops = Math.floor(Math.min(troops, F.troops));
+      if (troops < 1) return 'Not enough soldiers.';
+      let a = G.attacks.find(x => x.att === F.id && x.def === d);
+      if (!a) {
+        const fr = computeFrontier(F.id, d);
+        if (!fr.size) return 'noborder';
+        a = { id: G.nextAttackId++, att: F.id, def: d, troops: 0, frontier: fr, start: G.time };
+        G.attacks.push(a);
+      }
+      F.troops -= troops;
+      a.troops += troops;
+      if (d) {
+        const D = G.fams[d];
+        addHeat(F, 2.5);
+        D.grudge[F.id] = G.time;
+        if (D.isPlayer) addLog(`The ${F.name} family moves ${Math.round(troops).toLocaleString()} soldiers against your turf!`, 'bad');
+        else if (F.isPlayer && a.troops === troops) addLog(`War! You send ${troops.toLocaleString()} soldiers against the ${D.name} family.`, 'war');
+      } else addHeat(F, 0.2);
+      return true;
+    };
+    G.retreat = function (F, a) {
+      const k = G.attacks.indexOf(a);
+      if (k < 0 || a.att !== F.id) return;
+      F.troops += a.troops * 0.8;
+      G.attacks.splice(k, 1);
+    };
+
+    function conquer(i, o) {
+      const old = owner[i];
+      setOwner(i, o);
+      if (racketAt[i] >= 0) {
+        const rk = G.rackets[racketAt[i]];
+        const A = G.fams[o];
+        addHeat(A, 2);
+        if (A.isPlayer) addLog(`You muscle in on the ${RACKETS[rk.type].name} in ${rk.district}.`, 'good');
+        else if (old === 1) addLog(`The ${A.name} family takes your ${RACKETS[rk.type].name} in ${rk.district}!`, 'bad');
+      }
+      if (old) {
+        const D = G.fams[old];
+        if (D.compound === i || D.tiles <= 0) eliminate(old, o);
+      }
+    }
+
+    function eliminate(fid, by) {
+      const D = G.fams[fid];
+      if (!D.alive) return;
+      D.alive = false;
+      const B = by ? G.fams[by] : null;
+      let n = 0;
+      const cpd = D.compound;
+      for (let i = 0; i < N; i++) if (owner[i] === fid) {
+        if (by && dist2(i, cpd) <= 900) { setOwner(i, by); n++; } else setOwner(i, 0);
+      }
+      if (B) {
+        B.cash += D.cash * 0.5;
+        B.troops = Math.min(B.troops + D.troops * 0.3, B.maxTroops * 1.5);
+      }
+      D.troops = 0; D.cash = 0; D.crew = []; updateSpecs(D);
+      G.attacks = G.attacks.filter(a => {
+        if (a.att === fid) return false;
+        if (a.def === fid) { G.fams[a.att].troops += a.troops; return false; }
+        return true;
+      });
+      G.boats = G.boats.filter(b => b.att !== fid);
+      if (D.isPlayer) {
+        addLog(`YOUR COMPOUND HAS FALLEN. The ${B ? B.name : 'rival'} family takes everything.`, 'bad');
+        G.result = { win: false, reason: `The ${B ? B.name : 'rival'} family stormed your compound.` };
+        G.phase = 'over';
+      } else {
+        addLog(`${D.don.toUpperCase()} GUNNED DOWN! The ${D.name} family is no more${B ? ` — the ${B.name}s absorb ${n.toLocaleString()} blocks, the rest is up for grabs` : ''}.`, 'major');
+      }
+    }
+
+    function removeAttack(a) {
+      const k = G.attacks.indexOf(a);
+      if (k >= 0) G.attacks.splice(k, 1);
+    }
+    function attackTick() {
+      const arr = [];
+      for (const a of G.attacks.slice()) {
+        if (G.attacks.indexOf(a) < 0) continue;
+        const A = G.fams[a.att], D = a.def ? G.fams[a.def] : null;
+        if (!A.alive || (D && !D.alive)) { removeAttack(a); continue; }
+        if ((G.tickN + a.id) % 12 === 0) a.frontier = computeFrontier(a.att, a.def);
+        if (!a.frontier.size || a.troops < 1) {
+          A.troops = Math.min(A.troops + a.troops, A.maxTroops * 1.2);
+          removeAttack(a);
+          continue;
+        }
+        arr.length = 0;
+        for (const i of a.frontier) {
+          let s = 0;
+          const n = nbrs(i, NB);
+          for (let m = 0; m < n; m++) if (owner[NB[m]] === a.att) s++;
+          arr.push([i, s + rng() * 2.2]);
+        }
+        arr.sort((p, q) => q[1] - p[1]);
+        const k2 = Math.max(1, Math.min(7, Math.ceil(arr.length * 0.035)));
+        for (let m = 0; m < k2 && m < arr.length; m++) {
+          const i = arr[m][0];
+          if (owner[i] !== a.def || !adjacentTo(i, a.att)) { a.frontier.delete(i); continue; }
+          const c = tileCost(A, D, i);
+          if (a.troops < c) {
+            // last push: chance proportional to what's left
+            const lucky = !(D && i === D.compound) && rng() < a.troops / c;
+            a.troops = 0;
+            if (!lucky) break;
+          } else a.troops -= c;
+          if (D) {
+            const dens = D.troops / Math.max(1, D.tiles);
+            D.troops = Math.max(0, D.troops - (dens * 0.6 + 0.3));
+          }
+          conquer(i, a.att);
+          if (!A.alive || (D && !D.alive) || G.attacks.indexOf(a) < 0) break;
+          a.frontier.delete(i);
+          const n = nbrs(i, NB);
+          for (let q = 0; q < n; q++) {
+            const j = NB[q];
+            if (owner[j] === a.def && terrain[j] !== WATER) a.frontier.add(j);
+          }
+          if (a.troops <= 0) break;
+        }
+        if (a.troops < 1) removeAttack(a);
+      }
+    }
+
+    // ---- boats
+    G.nearestDocks = function (F, i) {
+      let best = null, bd = 1e9;
+      for (const b of G.buildings) {
+        if (b.type !== 'docks' || owner[b.i] !== F.id) continue;
+        const d = dist2(b.i, i);
+        if (d < bd) { bd = d; best = b; }
+      }
+      return best;
+    };
+    G.sendBoat = function (F, i, troops) {
+      if (terrain[i] === WATER) return 'Pick a spot on land.';
+      if (owner[i] === F.id) return 'That is already your turf.';
+      if (!coastal[i]) return 'Boats can only land on the waterfront.';
+      const d = owner[i];
+      if (d && G.isTruce(F.id, d)) return `You have a truce with the ${G.fams[d].name} family.`;
+      const dk = G.nearestDocks(F, i);
+      if (!dk) return 'You need Docks to send boats.';
+      troops = Math.floor(Math.min(troops, F.troops));
+      if (troops < 10) return 'Not enough soldiers.';
+      F.troops -= troops;
+      const sx = dk.i % W + 0.5, sy = ((dk.i / W) | 0) + 0.5, tx = i % W + 0.5, ty = ((i / W) | 0) + 0.5;
+      G.boats.push({ id: G.nextBoatId++, att: F.id, x: sx, y: sy, sx, sy, tx, ty, target: i, troops, speed: 7 });
+      addHeat(F, 1);
+      if (F.isPlayer) addLog(`A boat with ${troops.toLocaleString()} soldiers leaves the docks.`, 'war');
+      else if (d === 1) addLog(`Lookouts spot a ${F.name} boat heading for your waterfront!`, 'bad');
+      return true;
+    };
+    function boatTick(dt) {
+      for (let k = G.boats.length - 1; k >= 0; k--) {
+        const b = G.boats[k];
+        const A = G.fams[b.att];
+        const dx = b.tx - b.x, dy = b.ty - b.y, d = Math.hypot(dx, dy);
+        const step = b.speed * dt;
+        if (d > step) { b.x += dx / d * step; b.y += dy / d * step; continue; }
+        G.boats.splice(k, 1);
+        if (!A.alive) continue;
+        const i = b.target, def = owner[i];
+        if (def === A.id) { A.troops += b.troops; continue; }
+        if (def && G.isTruce(A.id, def)) { A.troops += b.troops; continue; }
+        const D = def ? G.fams[def] : null;
+        const c = tileCost(A, D, i);
+        if (b.troops < c) {
+          if (A.isPlayer) addLog('Your landing party was cut down on the beach.', 'bad');
+          continue;
+        }
+        b.troops -= c;
+        conquer(i, A.id);
+        if (!A.alive) continue;
+        if (def && !G.fams[def].alive) { A.troops += b.troops; continue; }
+        let a = G.attacks.find(x => x.att === A.id && x.def === def);
+        if (!a) { a = { id: G.nextAttackId++, att: A.id, def, troops: 0, frontier: computeFrontier(A.id, def), start: G.time }; G.attacks.push(a); }
+        a.troops += b.troops;
+        if (A.isPlayer) addLog(`Your boat lands in ${G.districts[district[i]].name}. Beachhead secured!`, 'good');
+        else if (def === 1) addLog(`The ${A.name} family lands soldiers in ${G.districts[district[i]].name}!`, 'bad');
+      }
+    }
+
+    // ---- operations
+    G.firebomb = function (F, i) {
+      if (!F.spec.arsonist) return 'You need an Arsonist in your crew.';
+      if (F.cool.firebomb > G.time) return `Your arsonist is lying low (${Math.ceil(F.cool.firebomb - G.time)}s).`;
+      if (F.cash < FIREBOMB_COST) return 'Not enough cash.';
+      const d = owner[i];
+      if (!d || d === F.id) return 'Target a rival family\'s turf.';
+      if (G.isTruce(F.id, d)) return `You have a truce with the ${G.fams[d].name} family.`;
+      F.cash -= FIREBOMB_COST;
+      F.cool.firebomb = G.time + FIREBOMB_CD;
+      const D = G.fams[d];
+      const cx = i % W, cy = (i / W) | 0, R = 5;
+      let burned = 0, bld = 0;
+      for (let y = cy - R; y <= cy + R; y++) for (let x = cx - R; x <= cx + R; x++) {
+        if (x < 0 || y < 0 || x >= W || y >= H) continue;
+        if ((x - cx) ** 2 + (y - cy) ** 2 > R * R) continue;
+        const j = y * W + x;
+        const o = owner[j];
+        if (!o || o === F.id) continue;
+        if (G.isTruce(F.id, o)) continue;
+        const O = G.fams[o];
+        if (j === O.compound) continue;
+        const dens = O.troops / Math.max(1, O.tiles);
+        O.troops = Math.max(0, O.troops - dens * 1.5);
+        if (buildingAt[j]) { destroyBuilding(buildingAt[j]); bld++; }
+        setOwner(j, 0);
+        burned++;
+        if (O.tiles <= 0) eliminate(o, F.id);
+      }
+      addHeat(F, 20);
+      D.grudge[F.id] = G.time;
+      G.effects.push({ type: 'fire', x: cx + 0.5, y: cy + 0.5, r: R, t: G.time });
+      const where = G.districts[district[i]].name;
+      if (F.isPlayer) addLog(`FIRE IN ${where.toUpperCase()}! ${burned} ${D.name} blocks burned${bld ? `, ${bld} building${bld > 1 ? 's' : ''} destroyed` : ''}.`, 'war');
+      else if (d === 1) addLog(`ARSON! The ${F.name} family torches your turf in ${where}${bld ? ` and ${bld} building${bld > 1 ? 's' : ''}` : ''}.`, 'bad');
+      else addLog(`Mysterious blaze guts ${D.name} blocks in ${where}.`, 'info', false);
+      return true;
+    };
+    G.heist = function (F, d) {
+      if (!F.spec.safecracker) return 'You need a Safecracker in your crew.';
+      if (F.cool.heist > G.time) return `Your safecracker needs time (${Math.ceil(F.cool.heist - G.time)}s).`;
+      const D = G.fams[d];
+      if (!D || !D.alive || d === F.id) return 'Invalid target.';
+      if (G.isTruce(F.id, d)) return `You have a truce with the ${D.name} family.`;
+      F.cool.heist = G.time + HEIST_CD;
+      D.grudge[F.id] = G.time;
+      if (rng() < 0.75) {
+        const amt = Math.round(Math.min(D.cash * 0.3, 4000));
+        D.cash -= amt; F.cash += amt;
+        addHeat(F, 10);
+        if (F.isPlayer) addLog(`Clean job! Your safecracker lifts $${amt.toLocaleString()} from the ${D.name} counting room.`, 'good');
+        else if (d === 1) addLog(`Your counting room was cracked! The ${F.name} family stole $${amt.toLocaleString()}.`, 'bad');
+      } else {
+        addHeat(F, 15);
+        if (F.isPlayer) addLog(`The heist on the ${D.name}s went sideways. Cops are asking questions.`, 'bad');
+      }
+      return true;
+    };
+    G.hit = function (F, d) {
+      const D = G.fams[d];
+      if (!D || !D.alive || d === F.id) return 'Invalid target.';
+      if (G.isTruce(F.id, d)) return `You have a truce with the ${D.name} family.`;
+      if (!D.crew.length) return `The ${D.name} family has no made men to hit.`;
+      if (F.cool.hit > G.time) return `Wait ${Math.ceil(F.cool.hit - G.time)}s before ordering another hit.`;
+      const c = hitCost(F);
+      if (F.cash < c) return 'Not enough cash.';
+      F.cash -= c;
+      F.cool.hit = G.time + HIT_CD;
+      addHeat(F, 8);
+      D.grudge[F.id] = G.time;
+      const chance = Math.min(0.8, 0.5 + 0.1 * (F.spec.bruiser || 0));
+      if (rng() < chance) {
+        const k = (rng() * D.crew.length) | 0;
+        const v = D.crew.splice(k, 1)[0];
+        updateSpecs(D);
+        if (F.isPlayer) addLog(`${v.name} "${v.nick}" ${v.last} of the ${D.name} family sleeps with the fishes.`, 'war');
+        else if (d === 1) addLog(`HIT! Your ${SPECS[v.spec].name.toLowerCase()} ${v.name} "${v.nick}" ${v.last} was whacked by the ${F.name} family.`, 'bad');
+        else addLog(`${D.name} capo found dead in a Cadillac trunk.`, 'info', false);
+      } else {
+        addHeat(F, 6);
+        if (F.isPlayer) addLog(`The hit on the ${D.name} family failed. They know it was you.`, 'bad');
+        else if (d === 1) addLog(`Your men foiled a ${F.name} hit attempt.`, 'good');
+      }
+      return true;
+    };
+    const RELOCATE_COST = 1000, RELOCATE_CD = 90;
+    G.RELOCATE_COST = RELOCATE_COST;
+    G.relocate = function (F, i) {
+      if (F.cool.relocate > G.time) return `The Don just moved. Wait ${Math.ceil(F.cool.relocate - G.time)}s.`;
+      if (owner[i] !== F.id) return 'The Don can only move to your own turf.';
+      if (terrain[i] !== LAND || racketAt[i] >= 0 || buildingAt[i]) return 'Pick an empty block.';
+      if (F.cash < RELOCATE_COST) return 'Not enough cash.';
+      F.cash -= RELOCATE_COST;
+      F.cool.relocate = G.time + RELOCATE_CD;
+      const old = F.compound;
+      F.compound = i;
+      G.dirty.push(old, i);
+      if (F.isPlayer) addLog(`The Don goes to the mattresses — new compound in ${G.districts[district[i]].name}.`, 'good');
+      else addLog(`${F.don} slips out of town. Word is he's holed up in ${G.districts[district[i]].name}.`, 'info', false);
+      return true;
+    };
+    G.threatToCompound = function (F) {
+      // nearest hostile tile within 12 of the compound (or -1)
+      const cx = F.compound % W, cy = (F.compound / W) | 0, R = 12;
+      let best = -1, bd = 1e9;
+      for (let y = Math.max(0, cy - R); y <= Math.min(H - 1, cy + R); y++)
+        for (let x = Math.max(0, cx - R); x <= Math.min(W - 1, cx + R); x++) {
+          const j = y * W + x, o = owner[j];
+          if (!o || o === F.id || G.isTruce(F.id, o)) continue;
+          const d = (x - cx) ** 2 + (y - cy) ** 2;
+          if (d < bd) { bd = d; best = j; }
+        }
+      return best < 0 ? null : { tile: best, dist: Math.sqrt(bd) };
+    };
+
+    G.bribe = function (F) {
+      const c = bribeCost(F);
+      if (F.heat < 5) return 'The cops aren\'t even looking at you.';
+      if (F.cash < c) return 'Not enough cash.';
+      F.cash -= c;
+      F.heat = Math.max(0, F.heat - 35);
+      if (F.isPlayer) addLog(`An envelope finds its way to the precinct captain. Heat drops.`, 'good');
+      return true;
+    };
+    G.requestTruce = function (F, d) {
+      const D = G.fams[d];
+      if (!D || !D.alive) return 'Invalid.';
+      if (G.isTruce(F.id, d)) return 'Already at peace.';
+      if (F.cool.truce > G.time) return `The Dons won't sit down again so soon (${Math.ceil(F.cool.truce - G.time)}s).`;
+      F.cool.truce = G.time + 30;
+      const strength = (F.troops + F.tiles * 5) / (D.troops + D.tiles * 5 + 1);
+      let p = 0.15 + Math.min(0.5, strength * 0.3);
+      if (G.attacks.some(a => a.att === d && a.def !== F.id && a.def)) p += 0.2;
+      if ((D.grudge[F.id] || -1e9) > G.time - 30) p -= 0.25;
+      if (F.spec.consigliere) p += 0.2;
+      if (rng() < p) { makeTruce(F.id, d, 120); addLog(`The ${F.name} and ${D.name} families embrace at a sit-down. 2-minute truce.`, 'good'); return true; }
+      addLog(`${D.don} refuses to sit down with you.`, 'bad');
+      return false;
+    };
+    function makeTruce(a, b, sec) {
+      G.fams[a].truces[b] = G.time + sec;
+      G.fams[b].truces[a] = G.time + sec;
+      G.attacks = G.attacks.filter(x => {
+        if ((x.att === a && x.def === b) || (x.att === b && x.def === a)) { G.fams[x.att].troops += x.troops; return false; }
+        return true;
+      });
+    }
+    G.acceptOffer = function (k, yes) {
+      const o = G.offers[k];
+      if (!o) return;
+      G.offers.splice(k, 1);
+      if (yes) { makeTruce(1, o.from, 120); addLog(`You accept ${G.fams[o.from].don}'s offer. 2-minute truce.`, 'good'); }
+      else { G.fams[o.from].grudge[1] = G.time; addLog(`You spit on ${G.fams[o.from].don}'s offer.`, 'war'); }
+    };
+
+    // ---- AI
+    function aiThink(F) {
+      const cnt = new Map(), edge = new Map();
+      let ownSample = [], coastSample = [], seen = 0, cseen = 0;
+      for (let i = 0; i < N; i++) {
+        if (owner[i] !== F.id) continue;
+        seen++;
+        if (terrain[i] === LAND && !buildingAt[i] && racketAt[i] < 0 && i !== F.compound) {
+          if (ownSample.length < 20) ownSample.push(i); else if (rng() < 20 / seen) ownSample[(rng() * 20) | 0] = i;
+          if (coastal[i]) { cseen++; if (coastSample.length < 10) coastSample.push(i); else if (rng() < 10 / cseen) coastSample[(rng() * 10) | 0] = i; }
+        }
+        const n = nbrs(i, NB);
+        for (let m = 0; m < n; m++) {
+          const j = NB[m], o = owner[j];
+          if (o === F.id || terrain[j] === WATER) continue;
+          cnt.set(o, (cnt.get(o) || 0) + 1);
+          if (!edge.has(o) || rng() < 0.05) edge.set(o, j);
+        }
+      }
+      const p = F.troops / F.maxTroops;
+      const myAttacks = G.attacks.filter(a => a.att === F.id).length;
+      const P = G.player;
+
+      // --- attack
+      if (p > F.ai.attackAt && myAttacks < 2) {
+        if (cnt.get(0) > 0 && (rng() < 0.8 || cnt.size === 1)) {
+          G.launchAttack(F, 0, F.troops * F.ai.ratio);
+        } else {
+          let best = 0, bs = -1e9;
+          for (const [o] of cnt) {
+            if (!o) continue;
+            const D = G.fams[o];
+            if (G.isTruce(F.id, o)) continue;
+            let s = F.troops / (D.troops + 1);
+            if (D.isPlayer) s += diff.playerBias;
+            if ((F.grudge[o] || -1e9) > G.time - 60) s += 0.4;
+            s += (cnt.get(o) / 200);
+            if (s > bs) { bs = s; best = o; }
+          }
+          if (best && (bs > 0.9 || p > 0.92)) G.launchAttack(F, best, F.troops * (bs > 1.5 ? 0.5 : 0.35));
+          else if ((cnt.size === 0 || (!cnt.get(0) && p > 0.85)) && F.bcount.docks && G.boats.filter(b => b.att === F.id).length < 1) {
+            // go by sea
+            let target = -1;
+            for (let t = 0; t < 60; t++) {
+              const j = pick(G.coastalList), o = owner[j];
+              if (o === F.id || (o && G.isTruce(F.id, o))) continue;
+              if (!o) { target = j; break; }
+              if (target < 0 && G.fams[o].troops < F.troops) target = j;
+            }
+            if (target >= 0) G.sendBoat(F, target, F.troops * 0.4);
+          }
+        }
+      }
+
+      // --- build
+      const hostileNb = [...cnt.keys()].some(o => o && !G.isTruce(F.id, o));
+      let want = null;
+      if (!F.bcount.docks && coastSample.length && (!cnt.get(0) || F.havana) && (F.havana || rng() < 0.4)) want = 'docks';
+      else {
+        const r = rng();
+        want = r < 0.4 ? 'safehouse' : r < 0.75 ? 'front' : (hostileNb ? 'guard' : 'front');
+      }
+      if (F.cash > buildCost(F, want) + 100) {
+        const spots = want === 'docks' ? coastSample : ownSample;
+        for (const s of spots) if (G.build(F, want, s) === true) break;
+      }
+
+      // --- crew
+      if (F.crew.length < 3 && F.cash > recruitCost(F) + 300 && rng() < 0.3) G.recruit(F);
+
+      // --- operations
+      const rivals = [...cnt.keys()].filter(o => o && !G.isTruce(F.id, o));
+      if (F.spec.arsonist && F.cool.firebomb <= G.time && F.cash > FIREBOMB_COST + 600 && rivals.length && rng() < 0.25) {
+        let t = rivals.reduce((a, b) => (G.fams[b].troops > G.fams[a].troops ? b : a));
+        if (rivals.includes(1) && rng() < 0.3 + diff.playerBias) t = 1;
+        const j = edge.get(t);
+        if (j !== undefined && owner[j] === t) G.firebomb(F, j);
+      }
+      if (F.spec.safecracker && F.cool.heist <= G.time && rng() < 0.25) {
+        const others = G.fams.filter(x => x && x.alive && x.id !== F.id && !G.isTruce(F.id, x.id));
+        if (others.length) { const t = others.reduce((a, b) => (b.cash > a.cash ? b : a)); if (t.cash > 800) G.heist(F, t.id); }
+      }
+      if (F.cash > 2000 && rng() < 0.05 + diff.playerBias * 0.05) {
+        const t = (rng() < 0.5 && P.alive && P.crew.length && !G.isTruce(F.id, 1)) ? P : pick(G.fams.filter(x => x && x.alive && x.id !== F.id && x.crew.length));
+        if (t && !G.isTruce(F.id, t.id)) G.hit(F, t.id);
+      }
+      if (F.heat > 65 && F.cash > bribeCost(F) + 300) G.bribe(F);
+
+      // --- protect the Don
+      if (F.cool.relocate <= G.time && F.cash > RELOCATE_COST && ownSample.length) {
+        const th = G.threatToCompound(F);
+        if (th && th.dist < 7 && G.attacks.some(a => a.def === F.id)) {
+          let best = -1, bd = -1;
+          for (const s2 of ownSample) { const d = dist2(s2, th.tile); if (d > bd) { bd = d; best = s2; } }
+          if (best >= 0 && bd > 150) G.relocate(F, best);
+        }
+      }
+
+      // --- diplomacy with player
+      const underAttack = G.attacks.some(a => a.att === 1 && a.def === F.id);
+      if (underAttack && F.troops < P.troops * 0.6 && rng() < 0.12 && !G.offers.some(o => o.from === F.id) && !G.isTruce(F.id, 1)) {
+        G.offers.push({ from: F.id, expires: G.time + 15 });
+        addLog(`${F.don} sends a messenger: he wants a sit-down.`, 'info');
+      }
+    }
+
+    function checkEnd() {
+      if (G.phase !== 'play') return;
+      const P = G.player;
+      const share = P.tiles / G.landCount;
+      const aliveAI = G.fams.filter(f => f && !f.isPlayer && f.alive);
+      if (share >= 0.6 || aliveAI.length === 0) {
+        G.phase = 'over';
+        G.result = { win: true, reason: aliveAI.length === 0 ? 'Every rival Don is dead or in exile.' : 'You control 60% of the city.' };
+        addLog(`${P.don.toUpperCase()} IS CROWNED BOSS OF ALL BOSSES.`, 'major');
+        return;
+      }
+      for (const F of aliveAI) if (F.tiles / G.landCount >= 0.6) {
+        G.phase = 'over';
+        G.result = { win: false, reason: `${F.don} now controls the city. You've been pushed out.` };
+      }
+    }
+
+    // ---- main tick
+    G.tick = function () {
+      if (G.phase !== 'play') return;
+      G.time += TICK; G.tickN++;
+      for (let f = 1; f < G.fams.length; f++) { const F = G.fams[f]; if (F.alive) econTick(F, TICK); }
+      attackTick();
+      boatTick(TICK);
+      for (let f = 2; f < G.fams.length; f++) {
+        const F = G.fams[f];
+        if (!F.alive || G.phase !== 'play') continue;
+        if (G.time >= F.nextThink) { F.nextThink = G.time + diff.think * (0.7 + rng() * 0.6); aiThink(F); }
+      }
+      if (G.tickN % 10 === 0) secondTick();
+      G.effects = G.effects.filter(e => G.time - e.t < 2);
+    };
+    G.aiThink = aiThink;
+    G.secondTick = secondTick;
+    G.computeFrontier = computeFrontier;
+    return G;
+  }
+
+  return { createGame, W, H, N, WATER, LAND, BRIDGE, RACKETS, BUILDINGS, SPECS, TICK };
+})();
+if (typeof module !== 'undefined') module.exports = Engine;
+
+</script>
+<script>
+// ============================================================================
+//  OMERTÀ — UI, rendering & input
+// ============================================================================
+(function () {
+  'use strict';
+  const E = Engine, W = E.W, H = E.H, N = E.N;
+  const $ = s => document.querySelector(s);
+  const fmt = n => Math.round(n).toLocaleString('en-US');
+  const money = n => '$' + fmt(n);
+  const clock = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+  const rgb = (c, a) => a == null ? `rgb(${c[0]},${c[1]},${c[2]})` : `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  const COLORS = [[178, 34, 34], [30, 30, 30], [52, 92, 168], [96, 138, 52], [205, 158, 38], [128, 72, 150], [36, 146, 146], [222, 104, 40], [230, 230, 230]];
+
+  const HOW = `
+    <b>Goal:</b> control <b>60% of the city</b> or wipe out every rival family. If your <b>compound ★</b> falls, you're finished.
+    <ul>
+      <li><b>Take territory:</b> click land next to your turf. You send the % of soldiers set on the slider at the bottom (keys <b>1–9, 0</b>). Empty blocks are cheap; rival turf costs more the more soldiers they have per block.</li>
+      <li><b>Soldiers</b> recruit themselves fastest when you're around <b>half strength</b>, so keep attacking. More turf and <b>Safehouses</b> raise your cap.</li>
+      <li><b>Rackets</b> (🎲 💵 🍸 ⚓ 🎰 💊) pay cash every second. They're guarded, so they cost extra to take. Own <b>every racket of a kind</b> to hold a <b>Crime Ring</b> bonus. All the casinos are in Havana.</li>
+      <li><b>Build</b> on your turf: Safehouse (Q), Front Business (W), Guard Post (E), Docks (R). Docks let you <b>send boats</b>: click any waterfront block across the water.</li>
+      <li><b>Made men</b> (up to 4) give bonuses: bruisers hit harder, arsonists <b>firebomb</b> (F), safecrackers pull <b>heists</b>, consiglieri smooth things over.</li>
+      <li><b>Heat</b> goes up with violence. Above 50%, income drops 25%. Above 80%, the cops <b>raid</b> your rackets. <b>Bribe</b> them (B).</li>
+      <li><b>Diplomacy:</b> ask for truces, order hits on rival made men, or rob their counting rooms from the Families panel. If enemies close in on your compound, <b>go to the mattresses</b> (M) and move the Don.</li>
+    </ul>
+    <span class="tip">Drag to pan · scroll to zoom · Space to pause · Esc to cancel</span>`;
+  $('#howText').innerHTML = HOW;
+  $('#howText2').innerHTML = HOW;
+
+  // ------------------------------------------------------------ state ----
+  let G = null;
+  const setup = { name: 'Russo', color: COLORS[0], difficulty: 'normal', seed: (Math.random() * 1e9) | 0 };
+  const cam = { x: W / 2, y: H / 2, z: 4 };
+  let mode = null; // {type:'build', b} | {type:'firebomb'} | {type:'relocate'}
+  let ratio = 0.3, hover = -1, paused = false, speed = 1, mouse = { x: 0, y: 0, in: false };
+  let started = false, endShown = false;
+
+  const canvas = $('#map'), ctx = canvas.getContext('2d');
+  const mapCv = document.createElement('canvas'); mapCv.width = W; mapCv.height = H;
+  const mapCtx = mapCv.getContext('2d');
+  let img = mapCtx.createImageData(W, H);
+  let shade = new Float32Array(N), baseCol = new Uint8ClampedArray(N * 3);
+  let dpr = 1, cw = 0, ch = 0;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    cw = window.innerWidth; ch = window.innerHeight;
+    canvas.width = cw * dpr; canvas.height = ch * dpr;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function fitCamera() {
+    cam.z = Math.min(cw / W, ch / H) * 1.0;
+    cam.x = W / 2; cam.y = H / 2;
+  }
+
+  // ------------------------------------------------------------ colours ---
+  function hash(n) { n = (n ^ 61) ^ (n >>> 16); n = n + (n << 3); n = n ^ (n >>> 4); n = Math.imul(n, 0x27d4eb2d); return ((n ^ (n >>> 15)) >>> 0) / 4294967296; }
+  function precompute() {
+    const t = G.terrain, d = G.district;
+    for (let i = 0; i < N; i++) {
+      const x = i % W, y = (i / W) | 0;
+      shade[i] = 0.96 + hash(i * 7 + 3) * 0.06;
+      let c;
+      if (t[i] === E.WATER) {
+        // lighter near coast
+        let near = false;
+        for (let dy = -2; dy <= 2 && !near; dy++) for (let dx = -2; dx <= 2; dx++) {
+          const xx = x + dx, yy = y + dy;
+          if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+          if (t[yy * W + xx] !== E.WATER) { near = true; break; }
+        }
+        c = near ? [34, 55, 78] : [21, 35, 52];
+        const w = 0.93 + hash(i * 13) * 0.1;
+        c = c.map(v => v * w);
+      } else if (t[i] === E.BRIDGE) {
+        c = [96, 86, 74];
+      } else {
+        const tone = 0.93 + hash(d[i] * 31 + 5) * 0.09;
+        c = [224 * tone, 209 * tone, 172 * tone];
+        // district boundary lines
+        const r = x < W - 1 ? i + 1 : i, dn = y < H - 1 ? i + W : i;
+        if ((t[r] !== E.WATER && d[r] !== d[i]) || (t[dn] !== E.WATER && d[dn] !== d[i])) c = c.map(v => v * 0.86);
+        if (G.isHavana(i)) c = [c[0] * 1.0, c[1] * 0.97, c[2] * 0.86];
+        c = c.map(v => v * shade[i]);
+      }
+      baseCol[i * 3] = c[0]; baseCol[i * 3 + 1] = c[1]; baseCol[i * 3 + 2] = c[2];
+    }
+  }
+  function paintTile(i) {
+    const o = G.owner[i], k = i * 4;
+    let r = baseCol[i * 3], g = baseCol[i * 3 + 1], b = baseCol[i * 3 + 2];
+    if (o && G.terrain[i] !== E.WATER) {
+      const c = G.fams[o].color;
+      const x = i % W;
+      let border = false;
+      const on = G.owner, tt = G.terrain;
+      if ((x > 0 && on[i - 1] !== o && tt[i - 1] !== E.WATER) || (x < W - 1 && on[i + 1] !== o && tt[i + 1] !== E.WATER) ||
+          (i >= W && on[i - W] !== o && tt[i - W] !== E.WATER) || (i < N - W && on[i + W] !== o && tt[i + W] !== E.WATER)) border = true;
+      if (border) { r = c[0] * 0.55; g = c[1] * 0.55; b = c[2] * 0.55; }
+      else { const a = 0.58; r = r * (1 - a) + c[0] * a; g = g * (1 - a) + c[1] * a; b = b * (1 - a) + c[2] * a; }
+    }
+    img.data[k] = r; img.data[k + 1] = g; img.data[k + 2] = b; img.data[k + 3] = 255;
+  }
+  function repaintAll() { for (let i = 0; i < N; i++) paintTile(i); mapCtx.putImageData(img, 0, 0); G.dirty.length = 0; }
+  function flushDirty() {
+    if (!G.dirty.length) return;
+    const seen = new Set();
+    for (const i of G.dirty) {
+      seen.add(i);
+      const x = i % W;
+      if (x > 0) seen.add(i - 1);
+      if (x < W - 1) seen.add(i + 1);
+      if (i >= W) seen.add(i - W);
+      if (i < N - W) seen.add(i + W);
+    }
+    G.dirty.length = 0;
+    for (const i of seen) paintTile(i);
+    mapCtx.putImageData(img, 0, 0);
+  }
+
+  // ------------------------------------------------------------ camera ----
+  const toScreen = (tx, ty) => [(tx - cam.x) * cam.z + cw / 2, (ty - cam.y) * cam.z + ch / 2];
+  const toTile = (sx, sy) => [(sx - cw / 2) / cam.z + cam.x, (sy - ch / 2) / cam.z + cam.y];
+  function tileAt(sx, sy) {
+    const [tx, ty] = toTile(sx, sy);
+    const x = Math.floor(tx), y = Math.floor(ty);
+    if (x < 0 || y < 0 || x >= W || y >= H) return -1;
+    return y * W + x;
+  }
+  function clampCam() {
+    const minZ = Math.min(cw / W, ch / H) * 0.6;
+    cam.z = clamp(cam.z, minZ, 40);
+    cam.x = clamp(cam.x, 0, W); cam.y = clamp(cam.y, 0, H);
+  }
+
+  // ------------------------------------------------------------ render ----
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#15233a';
+    ctx.fillRect(0, 0, cw, ch);
+    if (!G) return;
+    flushDirty();
+    const z = cam.z;
+    const [ox, oy] = toScreen(0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(mapCv, ox, oy, W * z, H * z);
+    const vis = (tx, ty, m) => { const [sx, sy] = toScreen(tx, ty); return sx > -m && sy > -m && sx < cw + m && sy < ch + m; };
+
+    // district labels
+    if (z >= 3) {
+      const fs = clamp(z * 1.9, 9, 20);
+      ctx.font = `italic ${fs}px Georgia, serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(40,28,16,0.55)';
+      for (const d of G.districts) {
+        if (!vis(d.x, d.y, 100)) continue;
+        const [sx, sy] = toScreen(d.x, d.y - 2.2);
+        ctx.fillText(d.name.toUpperCase().split('').join(String.fromCharCode(8202)), sx, sy);
+      }
+    }
+    // Havana label + bridges
+    {
+      const [sx, sy] = toScreen(192, 107);
+      ctx.font = `bold ${clamp(z * 2.6, 10, 30)}px Georgia, serif`;
+      ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(233,210,160,0.55)';
+      ctx.fillText('HAVANA, CUBA', sx, sy);
+      ctx.font = `italic ${clamp(z * 1.4, 8, 16)}px Georgia, serif`;
+      ctx.fillText('reachable only by boat', sx, sy + clamp(z * 2.4, 10, 26));
+      if (z >= 6) {
+        ctx.font = `italic ${clamp(z * 1.1, 8, 13)}px Georgia, serif`;
+        ctx.fillStyle = 'rgba(230,215,180,0.7)';
+        for (const b of G.bridges) { if (!vis(b.x, b.y, 50)) continue; const [bx, by] = toScreen(b.x, b.y + 2.5); ctx.fillText(b.name, bx, by); }
+      }
+    }
+
+    // attack fronts glow (player involved)
+    const P = G.player;
+
+    // rackets
+    const iconFs = clamp(z * 2.4, 7, 30);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const rk of G.rackets) {
+      const x = rk.i % W + 0.5, y = ((rk.i / W) | 0) + 0.5;
+      if (!vis(x, y, 30)) continue;
+      const [sx, sy] = toScreen(x, y);
+      const o = G.owner[rk.i];
+      const rad = clamp(z * 1.6, 3.5, 20);
+      ctx.beginPath(); ctx.arc(sx, sy, rad, 0, Math.PI * 2);
+      ctx.fillStyle = o ? rgb(G.fams[o].color, 0.95) : 'rgba(30,24,18,0.85)';
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, z * 0.25); ctx.strokeStyle = G.rings[rk.type] && G.rings[rk.type] === o ? '#ffd76a' : 'rgba(0,0,0,0.8)'; ctx.stroke();
+      if (z >= 2.2) {
+        ctx.font = `${iconFs * 0.85}px serif`;
+        ctx.globalAlpha = rk.raidedUntil > G.time ? 0.35 : 1;
+        ctx.fillText(E.RACKETS[rk.type].icon, sx, sy + 1);
+        ctx.globalAlpha = 1;
+        if (rk.raidedUntil > G.time) { ctx.font = `${iconFs * 0.6}px serif`; ctx.fillText('🚔', sx + rad, sy - rad); }
+      }
+    }
+    // buildings
+    for (const b of G.buildings) {
+      const x = b.i % W + 0.5, y = ((b.i / W) | 0) + 0.5;
+      if (!vis(x, y, 30)) continue;
+      const [sx, sy] = toScreen(x, y);
+      const o = G.owner[b.i];
+      const s = clamp(z * 2.6, 4, 30);
+      ctx.fillStyle = 'rgba(245,235,210,0.95)';
+      ctx.strokeStyle = o ? rgb(G.fams[o].color.map(v => v * 0.5)) : '#000';
+      ctx.lineWidth = Math.max(1, z * 0.3);
+      ctx.fillRect(sx - s / 2, sy - s / 2, s, s); ctx.strokeRect(sx - s / 2, sy - s / 2, s, s);
+      if (z >= 2.6) { ctx.font = `${s * 0.72}px serif`; ctx.fillStyle = '#000'; ctx.fillText(E.BUILDINGS[b.type].icon, sx, sy + 1); }
+    }
+    // guard radius / firebomb preview
+    if (mode && hover >= 0) {
+      const hx = hover % W + 0.5, hy = ((hover / W) | 0) + 0.5;
+      const [sx, sy] = toScreen(hx, hy);
+      let r = 0, col = 'rgba(255,255,255,0.8)';
+      if (mode.type === 'firebomb') { r = 5; col = 'rgba(255,110,40,0.9)'; }
+      if (mode.type === 'build' && mode.b === 'guard') r = 8;
+      if (r) { ctx.beginPath(); ctx.arc(sx, sy, r * z, 0, Math.PI * 2); ctx.strokeStyle = col; ctx.setLineDash([6, 4]); ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]); }
+      let label = mode.type === 'build' ? E.BUILDINGS[mode.b].icon : mode.type === 'firebomb' ? '🔥' : '★';
+      const ok = mode.type === 'build' ? G.canBuild(P, mode.b, hover) === true : mode.type === 'relocate' ? G.owner[hover] === 1 : (G.owner[hover] && G.owner[hover] !== 1);
+      ctx.globalAlpha = 0.85;
+      ctx.font = `${clamp(z * 3, 14, 34)}px serif`;
+      ctx.fillText(label, sx, sy);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = ok ? '#8f8' : '#f55'; ctx.lineWidth = 2;
+      ctx.strokeRect(sx - z / 2 - 2, sy - z / 2 - 2, z + 4, z + 4);
+    }
+    // compounds
+    for (let f = 1; f < G.fams.length; f++) {
+      const F = G.fams[f];
+      if (!F.alive || F.compound < 0) continue;
+      const x = F.compound % W + 0.5, y = ((F.compound / W) | 0) + 0.5;
+      if (!vis(x, y, 60)) continue;
+      const [sx, sy] = toScreen(x, y);
+      star(sx, sy, clamp(z * 2.4, 6, 26), rgb(F.color), F.isPlayer ? '#ffe28a' : '#111');
+    }
+    // family labels
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let f = 1; f < G.fams.length; f++) {
+      const F = G.fams[f];
+      if (!F.alive || F.tiles < 8) continue;
+      if (!vis(F.labelX, F.labelY, 200)) continue;
+      const [sx, sy] = toScreen(F.labelX, F.labelY);
+      const fs = clamp(Math.sqrt(F.tiles) * z * 0.16, 9, 38);
+      ctx.font = `bold ${fs}px Georgia, serif`;
+      ctx.lineWidth = Math.max(2, fs / 6); ctx.strokeStyle = 'rgba(0,0,0,0.75)'; ctx.fillStyle = '#fff';
+      ctx.strokeText(F.name, sx, sy); ctx.fillText(F.name, sx, sy);
+      ctx.font = `${fs * 0.6}px Georgia, serif`;
+      ctx.lineWidth = Math.max(2, fs / 9);
+      const t = fmt(F.troops);
+      ctx.strokeText(t, sx, sy + fs * 0.75); ctx.fillStyle = '#f0e0b8'; ctx.fillText(t, sx, sy + fs * 0.75);
+    }
+    // boats
+    for (const b of G.boats) {
+      const [sx, sy] = toScreen(b.x, b.y);
+      const [tx, ty] = toScreen(b.tx + 0, b.ty + 0);
+      ctx.setLineDash([3, 5]); ctx.strokeStyle = rgb(G.fams[b.att].color, 0.7); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(tx, ty); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(sx, sy, clamp(z * 1.4, 4, 12), 0, Math.PI * 2);
+      ctx.fillStyle = rgb(G.fams[b.att].color); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.font = `${clamp(z * 1.6, 9, 16)}px Georgia`; ctx.fillStyle = '#fff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+      ctx.strokeText('⛵ ' + fmt(b.troops), sx, sy - clamp(z * 2.4, 10, 22)); ctx.fillText('⛵ ' + fmt(b.troops), sx, sy - clamp(z * 2.4, 10, 22));
+    }
+    // effects
+    for (const e of G.effects) {
+      const age = (G.time - e.t) / 2;
+      const [sx, sy] = toScreen(e.x, e.y);
+      const r = e.r * z * (0.4 + age * 0.9);
+      const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
+      g.addColorStop(0, `rgba(255,230,120,${0.9 * (1 - age)})`);
+      g.addColorStop(0.5, `rgba(255,110,30,${0.7 * (1 - age)})`);
+      g.addColorStop(1, 'rgba(120,20,0,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
+    }
+    // hover outline
+    if (hover >= 0 && !mode && G.terrain[hover] !== E.WATER) {
+      const [sx, sy] = toScreen(hover % W, (hover / W) | 0);
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(sx, sy, z, z);
+    }
+  }
+  function star(x, y, r, fill, stroke) {
+    ctx.beginPath();
+    for (let k = 0; k < 10; k++) {
+      const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r;
+      ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+    }
+    ctx.closePath();
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.lineWidth = Math.max(1.5, r / 6); ctx.strokeStyle = stroke; ctx.stroke();
+  }
+
+  // ------------------------------------------------------------ tooltip ---
+  function updateTooltip() {
+    const tip = $('#tooltip');
+    if (!G || hover < 0 || !mouse.in || G.terrain[hover] === E.WATER) { tip.classList.add('hidden'); return; }
+    const i = hover, o = G.owner[i];
+    const d = G.districts[G.district[i]];
+    let h = `<div class="t">${d ? d.name : ''}${G.terrain[i] === E.BRIDGE ? ' · bridge' : ''}</div>`;
+    h += o ? `<div><span class="chip" style="background:${rgb(G.fams[o].color)}"></span>${G.fams[o].name} family</div>` : '<div style="color:#9d8b68">Unclaimed turf</div>';
+    if (G.racketAt[i] >= 0) {
+      const rk = G.rackets[G.racketAt[i]], R = E.RACKETS[rk.type];
+      h += `<div>${R.icon} ${R.name} · <span style="color:#9fbf7a">$${R.income}/s</span>${rk.raidedUntil > G.time ? ' <span style="color:#f77">(raided)</span>' : ''}</div>`;
+    }
+    const b = G.buildingAt[i];
+    if (b) h += `<div>${E.BUILDINGS[b.type].icon} ${E.BUILDINGS[b.type].name}</div>`;
+    for (let f = 1; f < G.fams.length; f++) if (G.fams[f].alive && G.fams[f].compound === i) h += `<div style="color:#ffd76a">★ Compound of ${G.fams[f].don}</div>`;
+    if (G.phase === 'play' && o !== 1) {
+      const D = o ? G.fams[o] : null;
+      const c = G.tileCost(G.player, D, i);
+      h += `<div style="color:#b9a67f;font-size:10.5px;margin-top:2px">≈ ${fmt(c)} soldiers to take this block</div>`;
+      if (o && G.isTruce(1, o)) h += `<div style="color:#9fbf7a;font-size:10.5px">Truce in effect</div>`;
+    }
+    tip.innerHTML = h;
+    tip.classList.remove('hidden');
+    let x = mouse.x + 16, y = mouse.y + 16;
+    if (x + 250 > cw) x = mouse.x - 250;
+    if (y + tip.offsetHeight > ch) y = mouse.y - tip.offsetHeight - 10;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+
+  // ------------------------------------------------------------ toasts ----
+  function toast(msg, ok) {
+    const el = document.createElement('div');
+    el.className = 'toast' + (ok ? ' ok' : '');
+    el.textContent = msg;
+    $('#toasts').appendChild(el);
+    setTimeout(() => el.remove(), 2700);
+    while ($('#toasts').children.length > 3) $('#toasts').firstChild.remove();
+  }
+
+  // ------------------------------------------------------------ panels ----
+  function setHint() {
+    let h = '';
+    if (!G || G.phase !== 'play') h = '';
+    else if (mode && mode.type === 'build') h = `Placing ${E.BUILDINGS[mode.b].name}: ${E.BUILDINGS[mode.b].desc}. Click your turf · Shift to keep placing · Esc to cancel`;
+    else if (mode && mode.type === 'firebomb') h = 'FIREBOMB: click rival turf. Burns a radius of 5 blocks and destroys buildings · Esc to cancel';
+    else if (mode && mode.type === 'relocate') h = 'GO TO THE MATTRESSES: click one of your own empty blocks to move the Don · Esc to cancel';
+    else h = 'Click next to your turf to attack · click across water to send a boat (needs Docks)';
+    $('#hint').textContent = h;
+  }
+
+  function updatePanels() {
+    if (!G) return;
+    const P = G.player;
+    // top
+    $('#sCash').innerHTML = `${money(P.cash)} <small>+${fmt(P.income)}/s</small>`;
+    $('#sTroops').innerHTML = `${fmt(P.troops)}<small style="color:#9d8b68"> / ${fmt(P.maxTroops)}</small>`;
+    $('#sTerr').textContent = (P.tiles / G.landCount * 100).toFixed(1) + '%';
+    $('#sHeat').style.width = P.heat + '%';
+    $('#sHeatN').textContent = Math.round(P.heat) + '%';
+    $('#sTime').textContent = clock(G.time);
+    $('#ratioLbl').textContent = `${Math.round(ratio * 100)}% · ${fmt(P.troops * ratio)} soldiers`;
+    $('#donName').textContent = P.don;
+    $('#dateline').textContent = `Late City Edition · ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][Math.floor(G.time / 60) % 7]}, Day ${Math.floor(G.time / 60) + 1} · 5¢`;
+
+    // crew
+    let h = '';
+    for (let k = 0; k < 4; k++) {
+      const c = P.crew[k];
+      if (c) {
+        const S = E.SPECS[c.spec];
+        h += `<div class="crew"><div class="ic">${S.icon}</div><div><div class="nm">${c.name} <i>"${c.nick}"</i> ${c.last}</div><div class="ds">${S.name}: ${S.desc}</div></div></div>`;
+      } else h += `<div class="crew empty">empty seat at the table</div>`;
+    }
+    $('#crewBox').innerHTML = h;
+    // candidates
+    h = '';
+    const rc = G.recruitCost(P);
+    if (P.crew.length >= 4) h = '<div class="tip">Your table is full. Made men lost to hits free up a seat.</div>';
+    else G.candidates.forEach((c, k) => {
+      const S = E.SPECS[c.spec];
+      h += `<div class="cand"><span class="ic">${S.icon}</span><div class="grow">${c.name} "${c.nick}" ${c.last}<br><span>${S.name}: ${S.desc}</span></div>
+        <button class="btn ${P.cash < rc ? 'dis' : ''}" data-act="recruit" data-k="${k}">${money(rc)}</button></div>`;
+    });
+    $('#candBox').innerHTML = h;
+    $('#candTimer').textContent = G.phase === 'play' ? `new faces in ${Math.max(0, Math.ceil(G.candRefresh - G.time))}s` : '';
+    // build
+    h = '';
+    for (const t in E.BUILDINGS) {
+      const B = E.BUILDINGS[t], c = G.buildCost(P, t);
+      h += `<button class="btn bbtn ${mode && mode.b === t ? 'on' : ''} ${P.cash < c ? 'dis' : ''}" data-act="build" data-b="${t}" title="${B.desc}">
+        <span class="ic">${B.icon}</span><span class="nm">${B.name}</span><span class="cs">${money(c)}</span> <span class="tip">×${P.bcount[t]}</span><kbd>${B.key}</kbd></button>`;
+    }
+    $('#buildBox').innerHTML = h;
+    // ops
+    const fbReady = P.cool.firebomb <= G.time, arson = !!P.spec.arsonist;
+    const bc = G.bribeCost(P), rl = P.cool.relocate <= G.time;
+    h = `<button class="btn op ${mode && mode.type === 'firebomb' ? 'on' : ''} ${!arson || !fbReady || P.cash < G.FIREBOMB_COST ? 'dis' : ''}" data-act="firebomb">
+          <span class="ic">🔥</span><div><div class="nm">Firebomb · ${money(G.FIREBOMB_COST)}</div><div class="ds">${!arson ? 'Needs an Arsonist in your crew' : fbReady ? 'Burn out a 5-block radius of rival turf' : `Arsonist lying low: ${Math.ceil(P.cool.firebomb - G.time)}s`}</div></div><kbd>F</kbd></button>
+        <button class="btn op ${P.cash < bc || P.heat < 5 ? 'dis' : ''}" data-act="bribe">
+          <span class="ic">✉️</span><div><div class="nm">Bribe the precinct · ${money(bc)}</div><div class="ds">−35 heat. ${P.heat >= 80 ? '<span style="color:#f77">RAIDS ACTIVE</span>' : P.heat > 50 ? '<span style="color:#fb6">Income −25%</span>' : 'Cops are quiet'}</div></div><kbd>B</kbd></button>
+        <button class="btn op ${mode && mode.type === 'relocate' ? 'on' : ''} ${!rl || P.cash < G.RELOCATE_COST ? 'dis' : ''}" data-act="relocate">
+          <span class="ic">🛏️</span><div><div class="nm">Go to the mattresses · ${money(G.RELOCATE_COST)}</div><div class="ds">${rl ? 'Move the Don’s compound somewhere safer' : `The Don just moved: ${Math.ceil(P.cool.relocate - G.time)}s`}</div></div><kbd>M</kbd></button>`;
+    $('#opsBox').innerHTML = h;
+    // rings
+    h = '';
+    for (const t in E.RACKETS) {
+      const R = E.RACKETS[t];
+      const all = G.rackets.filter(r => r.type === t), mine = all.filter(r => G.owner[r.i] === 1).length;
+      const holder = G.rings[t];
+      h += `<div class="ring" title="${R.name}: $${R.income}/s each. Ring bonus: ${R.ring}"><span class="ic">${R.icon}</span><div class="grow">${R.name}<div class="tip" style="font-size:9.5px">${R.ring}</div></div>
+        ${holder ? `<span class="chip" style="background:${rgb(G.fams[holder].color)}" title="${G.fams[holder].name}"></span>` : ''}<span class="own">${mine}/${all.length}</span></div>`;
+    }
+    $('#ringBox').innerHTML = h;
+
+    // families
+    h = '';
+    const fams = G.fams.slice(1).sort((a, b) => (b.alive - a.alive) || (b.tiles - a.tiles));
+    for (const F of fams) {
+      const pc = (F.tiles / G.landCount * 100).toFixed(1);
+      const truce = G.isTruce(1, F.id);
+      const atWar = G.attacks.some(a => (a.att === 1 && a.def === F.id) || (a.att === F.id && a.def === 1));
+      const crewIcons = F.crew.map(c => E.SPECS[c.spec].icon).join('');
+      h += `<div class="fam ${F.isPlayer ? 'me' : ''} ${F.alive ? '' : 'dead'}" style="border-left-color:${rgb(F.color)}">
+        <div class="row"><span class="nm">${F.alive ? '' : '✝ '}${F.name}${F.isPlayer ? ' <span class="tip">(you)</span>' : ''}
+          ${!F.isPlayer && truce ? `<span class="tag peace">truce ${clock(F.truces[1] - G.time)}</span>` : ''}${!F.isPlayer && atWar ? '<span class="tag war">at war</span>' : ''}</span>
+          <span class="pc">${F.alive ? pc + '%' : ''}</span></div>`;
+      if (F.alive) {
+        h += `<div class="sub">${F.don} · 🔫 ${fmt(F.troops)} ${crewIcons ? '· ' + crewIcons : ''} · 🎲 ${F.racketCount}${F.heat >= 80 ? ' · 🚔' : ''}</div>`;
+        if (!F.isPlayer && G.phase === 'play') {
+          const hc = G.hitCost(P);
+          h += `<div class="btns">
+            <button class="btn ${truce || P.cool.truce > G.time ? 'dis' : ''}" data-act="truce" data-f="${F.id}" title="Ask for a 2-minute truce">🤝 Truce${P.cool.truce > G.time ? ' ' + Math.ceil(P.cool.truce - G.time) + 's' : ''}</button>
+            <button class="btn ${truce || !F.crew.length || P.cash < hc || P.cool.hit > G.time ? 'dis' : ''}" data-act="hit" data-f="${F.id}" title="${F.crew.length ? 'Order a hit on one of their made men (' + money(hc) + ')' : 'They have no made men'}">🔫 Hit ${money(hc)}</button>
+            <button class="btn ${truce || !P.spec.safecracker || P.cool.heist > G.time ? 'dis' : ''}" data-act="heist" data-f="${F.id}" title="${P.spec.safecracker ? 'Rob their counting room (steal 30% of their cash)' : 'Needs a Safecracker'}">🔓 Heist</button>
+          </div>`;
+        }
+      } else h += `<div class="sub">gunned down</div>`;
+      h += `</div>`;
+    }
+    $('#famBox').innerHTML = h;
+    // offers
+    h = '';
+    G.offers.forEach((o, k) => {
+      const F = G.fams[o.from];
+      h += `<div class="offer">🕊️ <b>${F.don}</b> asks for a sit-down: a 2-minute truce. (${Math.ceil(o.expires - G.time)}s)
+        <div class="btns"><button class="btn" data-act="offer" data-k="${k}" data-y="1">Accept</button><button class="btn" data-act="offer" data-k="${k}" data-y="0">Refuse</button></div></div>`;
+    });
+    $('#offerBox').innerHTML = h;
+
+    // attacks
+    h = '';
+    for (const a of G.attacks) {
+      if (a.att === 1) {
+        const tn = a.def ? G.fams[a.def].name : 'unclaimed turf';
+        h += `<div class="atk"><span class="chip" style="background:${a.def ? rgb(G.fams[a.def].color) : '#d6c7a0'}"></span>→ ${tn} · ${fmt(a.troops)} <button class="btn" data-act="retreat" data-id="${a.id}" title="Pull back (80% of soldiers return)">✕</button></div>`;
+      } else if (a.def === 1) {
+        h += `<div class="atk in"><span class="chip" style="background:${rgb(G.fams[a.att].color)}"></span>${G.fams[a.att].name} attacking · ${fmt(a.troops)}</div>`;
+      }
+    }
+    for (const b of G.boats) if (b.att === 1) h += `<div class="atk">⛵ at sea · ${fmt(b.troops)}</div>`;
+    $('#attacks').innerHTML = h;
+
+    // news
+    const items = G.log.filter(l => l.relevant || l.kind === 'major').slice(-9).reverse();
+    $('#newsList').innerHTML = items.map(l => `<div class="${l.kind}"><b>${clock(l.t)}</b>${l.text}</div>`).join('');
+
+    // compound threat
+    const warn = $('#warn');
+    if (G.phase === 'play' && P.alive) {
+      const th = G.threatToCompound(P);
+      if (th && th.dist < 9 && G.attacks.some(a => a.def === 1)) {
+        warn.textContent = `⚠ Enemy soldiers are ${Math.round(th.dist)} blocks from the Don's compound! Build a Guard Post (E) or go to the mattresses (M).`;
+        warn.classList.remove('hidden');
+      } else warn.classList.add('hidden');
+    } else warn.classList.add('hidden');
+
+    setHint();
+  }
+
+  // ------------------------------------------------------------ actions ---
+  function doAction(el) {
+    const act = el.dataset.act, P = G.player;
+    if (!G || G.phase !== 'play') return;
+    let r;
+    switch (act) {
+      case 'recruit': r = G.recruit(P, +el.dataset.k); break;
+      case 'build': setMode(mode && mode.b === el.dataset.b ? null : { type: 'build', b: el.dataset.b }); break;
+      case 'firebomb':
+        if (!P.spec.arsonist) r = 'You need an Arsonist in your crew. Recruit one on the left.';
+        else setMode(mode && mode.type === 'firebomb' ? null : { type: 'firebomb' });
+        break;
+      case 'relocate': setMode(mode && mode.type === 'relocate' ? null : { type: 'relocate' }); break;
+      case 'bribe': r = G.bribe(P); if (r === true) toast('The captain pockets the envelope. Heat −35.', true); break;
+      case 'truce': r = G.requestTruce(P, +el.dataset.f); if (r === true) toast('Truce agreed.', true); else if (r === false) { toast('They refused the sit-down.'); r = true; } break;
+      case 'hit': r = G.hit(P, +el.dataset.f); break;
+      case 'heist': r = G.heist(P, +el.dataset.f); break;
+      case 'offer': G.acceptOffer(+el.dataset.k, el.dataset.y === '1'); break;
+      case 'retreat': { const a = G.attacks.find(x => x.id === +el.dataset.id); if (a) G.retreat(P, a); break; }
+    }
+    if (typeof r === 'string') toast(r);
+    updatePanels();
+  }
+  for (const id of ['#left', '#right', '#bottom']) {
+    $(id).addEventListener('pointerdown', e => {
+      const el = e.target.closest('[data-act]');
+      if (el) { e.preventDefault(); doAction(el); }
+    });
+  }
+  function setMode(m) { mode = m; setHint(); updatePanels(); }
+
+  function clickTile(i, shift) {
+    if (i < 0) return;
+    if (G.phase === 'spawn') {
+      if (G.placePlayer(i)) {
+        $('#bBegin').classList.remove('hidden');
+        toast(`Compound planted in ${G.districts[G.district[i]].name}.`, true);
+      } else toast('Pick a land block without a racket on it.');
+      return;
+    }
+    if (G.phase !== 'play') return;
+    const P = G.player;
+    if (mode) {
+      let r;
+      if (mode.type === 'build') { r = G.build(P, mode.b, i); if (r === true && !shift) setMode(null); }
+      else if (mode.type === 'firebomb') { r = G.firebomb(P, i); if (r === true) setMode(null); }
+      else if (mode.type === 'relocate') { r = G.relocate(P, i); if (r === true) setMode(null); }
+      if (typeof r === 'string') toast(r);
+      updatePanels();
+      return;
+    }
+    if (G.terrain[i] === E.WATER) return;
+    const o = G.owner[i];
+    if (o === 1) { toast('That\'s your turf. Pick a building (Q/W/E/R) to build here.'); return; }
+    const troops = P.troops * ratio;
+    let r = G.launchAttack(P, o, troops);
+    if (r === 'noborder') {
+      if (G.coastal[i] && G.nearestDocks(P, i)) r = G.sendBoat(P, i, troops);
+      else if (G.nearestDocks(P, i)) r = 'Boats can only land on the waterfront.';
+      else r = 'You don\'t border that turf. Build Docks (R) on your waterfront to strike across the water.';
+    }
+    if (typeof r === 'string') toast(r);
+    updatePanels();
+  }
+
+  // ------------------------------------------------------------ input -----
+  let drag = null;
+  canvas.addEventListener('pointerdown', e => {
+    if (e.button === 2) { setMode(null); return; }
+    drag = { x: e.clientX, y: e.clientY, cx: cam.x, cy: cam.y, moved: false, id: e.pointerId };
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', e => {
+    mouse.x = e.clientX; mouse.y = e.clientY; mouse.in = true;
+    hover = tileAt(e.clientX, e.clientY);
+    if (drag) {
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
+      if (drag.moved) {
+        cam.x = drag.cx - dx / cam.z; cam.y = drag.cy - dy / cam.z; clampCam();
+        canvas.classList.add('dragging');
+      }
+    }
+  });
+  canvas.addEventListener('pointerup', e => {
+    if (drag && !drag.moved && e.button === 0) clickTile(tileAt(e.clientX, e.clientY), e.shiftKey);
+    drag = null; canvas.classList.remove('dragging');
+  });
+  canvas.addEventListener('pointerleave', () => { mouse.in = false; hover = -1; });
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const [bx, by] = toTile(e.clientX, e.clientY);
+    const f = Math.exp(-e.deltaY * 0.0015);
+    cam.z *= f; clampCam();
+    const [ax, ay] = toTile(e.clientX, e.clientY);
+    cam.x += bx - ax; cam.y += by - ay; clampCam();
+  }, { passive: false });
+
+  window.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' && e.target.type === 'text') return;
+    if (!G || !started) return;
+    const k = e.key.toLowerCase();
+    if (k === ' ') { e.preventDefault(); togglePause(); return; }
+    if (k === 'escape') { setMode(null); $('#helpOv').classList.add('hidden'); return; }
+    if (G.phase !== 'play') return;
+    if (k >= '0' && k <= '9') { ratio = k === '0' ? 1 : (+k) / 10; $('#ratio').value = ratio * 100; updatePanels(); return; }
+    const bmap = { q: 'safehouse', w: 'front', e: 'guard', r: 'docks' };
+    if (bmap[k]) { setMode(mode && mode.b === bmap[k] ? null : { type: 'build', b: bmap[k] }); return; }
+    if (k === 'f') { doAction({ dataset: { act: 'firebomb' } }); return; }
+    if (k === 'b') { doAction({ dataset: { act: 'bribe' } }); return; }
+    if (k === 'm') { doAction({ dataset: { act: 'relocate' } }); return; }
+    const pan = 40 / cam.z;
+    if (k === 'arrowleft') cam.x -= pan; if (k === 'arrowright') cam.x += pan;
+    if (k === 'arrowup') cam.y -= pan; if (k === 'arrowdown') cam.y += pan;
+    clampCam();
+  });
+  $('#ratio').addEventListener('input', e => { ratio = e.target.value / 100; updatePanels(); });
+
+  function togglePause() {
+    paused = !paused;
+    $('#bPause').textContent = paused ? '▶' : '❚❚';
+    $('#bPause').classList.toggle('on', paused);
+    if (paused) toast('Paused. The city holds its breath.', true);
+  }
+  $('#bPause').onclick = togglePause;
+  $('#bSpeed').onclick = () => { speed = speed === 1 ? 2 : speed === 2 ? 3 : 1; $('#bSpeed').textContent = speed + '×'; };
+  $('#bHelp').onclick = () => $('#helpOv').classList.remove('hidden');
+  $('#bHelpClose').onclick = () => $('#helpOv').classList.add('hidden');
+
+  // ------------------------------------------------------------ setup -----
+  const sw = $('#swatches');
+  COLORS.forEach((c, k) => {
+    const d = document.createElement('div');
+    d.className = 'swatch' + (k === 0 ? ' on' : '');
+    d.style.background = rgb(c);
+    d.onclick = () => { setup.color = c; sw.querySelectorAll('.swatch').forEach(s => s.classList.remove('on')); d.classList.add('on'); };
+    sw.appendChild(d);
+  });
+  $('#diffSeg').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    setup.difficulty = b.dataset.d;
+    $('#diffSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  });
+
+  function newGame() {
+    G = E.createGame({ seed: setup.seed, playerName: setup.name, playerColor: setup.color, difficulty: setup.difficulty });
+    precompute();
+    repaintAll();
+  }
+  newGame();
+  fitCamera();
+
+  $('#bStart').onclick = () => {
+    setup.name = $('#inName').value.trim() || 'Russo';
+    newGame();
+    $('#startOv').classList.add('hidden');
+    $('#spawnBar').classList.remove('hidden');
+    started = true;
+  };
+  $('#bBegin').onclick = () => {
+    if (!G.start()) return;
+    $('#spawnBar').classList.add('hidden');
+    for (const id of ['#top', '#left', '#right', '#bottom', '#news']) $(id).classList.remove('hidden');
+    // zoom toward player
+    cam.x = G.player.compound % W; cam.y = (G.player.compound / W) | 0; cam.z = Math.max(cam.z, Math.min(cw / W, ch / H) * 1.7); clampCam();
+    updatePanels();
+    toast('Expand fast: click the empty land around your turf.', true);
+  };
+  $('#bAgain').onclick = () => {
+    setup.seed = (Math.random() * 1e9) | 0;
+    endShown = false; mode = null; paused = false; $('#bPause').textContent = '❚❚'; $('#bPause').classList.remove('on');
+    $('#endOv').classList.add('hidden');
+    for (const id of ['#top', '#left', '#right', '#bottom', '#news']) $(id).classList.add('hidden');
+    $('#bBegin').classList.add('hidden');
+    newGame(); fitCamera();
+    $('#spawnBar').classList.remove('hidden');
+  };
+
+  function showEnd() {
+    endShown = true;
+    const P = G.player, win = G.result && G.result.win;
+    $('#endTitle').textContent = win ? 'CAPO DI TUTTI CAPI' : 'THE DON IS DEAD';
+    $('#endTitle').style.color = win ? '#d9b25f' : '#e0644f';
+    $('#endReason').textContent = (G.result ? G.result.reason : '') + (win ? ' New York, and Havana, answer to you now.' : ' Your family becomes a story the old men tell.');
+    const dead = G.fams.filter(f => f && !f.isPlayer && !f.alive).length;
+    $('#endStats').innerHTML = `<div><b>${clock(G.time)}</b><span>Time</span></div><div><b>${(P.stats.peak / G.landCount * 100).toFixed(1)}%</b><span>Peak territory</span></div><div><b>${dead}</b><span>Families fallen</span></div>`;
+    $('#endOv').classList.remove('hidden');
+  }
+
+  // ------------------------------------------------------------ loop ------
+  let last = performance.now(), acc = 0, panelT = 0;
+  function frame(now) {
+    const dt = Math.min(0.25, (now - last) / 1000); last = now;
+    if (G && G.phase === 'play' && !paused) {
+      acc += dt * speed;
+      let n = 0;
+      while (acc >= E.TICK && n < 8) { G.tick(); acc -= E.TICK; n++; }
+      if (n >= 8) acc = 0;
+    }
+    draw();
+    panelT += dt;
+    if (panelT > 0.25 && G && G.phase !== 'spawn') { panelT = 0; updatePanels(); }
+    updateTooltip();
+    if (G && G.phase === 'over' && !endShown) { updatePanels(); setTimeout(showEnd, 900); endShown = true; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+</script>
+</body>
+</html>

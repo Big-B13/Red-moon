@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// ── Red Moon · Firestore rules ────────────────────────────────────
+// Lock everything to the archivist's UID (and optionally a second
+// trusted UID). Find your UID: Firebase console → Authentication →
+// Users → copy the UID of your account, paste it below.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isArchivist() {
+      return request.auth != null
+        && request.auth.uid in [
+          'PASTE_YOUR_UID_HERE'
+          // , 'OPTIONAL_SECOND_UID_HERE'
+        ];
+    }
+
+    match /entries/{doc} {
+      allow read, write: if isArchivist();
+    }
+
+    match /people/{doc} {
+      allow read, write: if isArchivist();
+    }
+
+    match /media/{doc} {
+      allow read, write: if isArchivist();
+    }
+
+    // Nothing else in this database is reachable.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

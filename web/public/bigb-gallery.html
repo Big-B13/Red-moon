@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigB - Gallery</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bigb.css">
+</head>
+<body class="bigb-page">
+    <!-- Navigation -->
+    <nav class="bigb-nav">
+        <div class="container">
+            <h1 class="logo bigb-logo">BigB</h1>
+            <ul class="nav-links">
+                <li><a href="about.html">← Switch back to Brian</a></li>
+                <li><a href="bigb.html">About Big-B</a></li>
+                <li><a href="Big-BProjects.html">The Vault</a></li>
+                <li><a href="bigb-contact.html">Contact</a></li>
+                                <li><a href="/games/" title="The Arcade">Games</a></li><li><a href="/login/" title="Red Moon" style="opacity:.25;font-size:.8em" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.25'">&#9679;</a></li>
+                </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="bigb-projects-hero">
+        <div class="container">
+            <h1 class="bigb-hero-title">FROZEN MOMENTS</h1>
+            <p class="bigb-hero-subtitle">Captured through my lens</p>
+            <p class="bigb-intro-text">
+                Photography is how I freeze time. Every frame is a story, the streets, the studio, the faces, the chaos. Click any photo to see it full size.
+            </p>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="projects-section bigb-projects-section">
+        <div class="container">
+
+            <h2 class="bigb-section-title">// THE COLLECTION</h2>
+
+            <!-- Masonry Gallery -->
+            <div class="gallery-grid">
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Duinen.jpg" alt="Duinen">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Duinen</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Egypt.jpg" alt="Egypt">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Egypt</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Metro tracks.jpg" alt="Metro tracks">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Metro Tracks</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Paris 1.jpg" alt="Paris 1">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Paris by Night</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Paris 2.jpg" alt="Paris 2">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Eiffel Reflections</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Plane.jpg" alt="Plane">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Above the Clouds</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Station Far.jpg" alt="Station Far">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Station Far</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Train Sunset.jpg" alt="Train Sunset">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Train Sunset</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Way Inholland.jpg" alt="Way Inholland">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Way to Inholland</span>
+                    </div>
+                </div>
+
+                <div class="gallery-item" onclick="openLightbox(this)">
+                    <img src="images/Zandvoort.jpg" alt="Zandvoort">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Zandvoort Sunrise</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Lightbox (hidden by default) -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="Full size">
+        <p id="lightbox-caption"></p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bigb-footer">
+        <p>&copy; 2026 BigB. Built different.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function openLightbox(item) {
+            const img = item.querySelector('img');
+            const caption = item.querySelector('.gallery-caption');
+            document.getElementById('lightbox-img').src = img.src;
+            document.getElementById('lightbox-caption').textContent = caption ? caption.textContent : '';
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>

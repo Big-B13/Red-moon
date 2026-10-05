@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Evidence - Brian</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <h1 class="logo">Brian</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                                <li><a href="/games/" title="The Arcade">Games</a></li><li><a href="/login/" title="Red Moon" style="opacity:.25;font-size:.8em" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.25'">&#9679;</a></li>
+                </ul>
+        </div>
+    </nav>
+
+    <!-- Internship View Section -->
+    <section class="poster-view-section">
+        <div class="container">
+            <a href="projects.html" class="back-button">← Back to Projects</a>
+
+            <div class="poster-header">
+                <h1>Internship Observation Days</h1>
+                <p class="project-subtitle">Business Maker Module – Evidence</p>
+            </div>
+
+            <div class="poster-description">
+                <h2>About This Experience</h2>
+                <p>Documentation from my internship observation days. Each photo captures a real moment and a lesson from my time on the job. Click any photo to view it full size.</p>
+            </div>
+
+            <!-- Photo Gallery with Context -->
+            <div class="internship-stories">
+
+                <div class="internship-story" onclick="openInternshipLightbox(this)">
+                    <img src="images/Working on the road.jpg" alt="Working on the road">
+                    <div class="story-content">
+                        <h3>Working on the Road</h3>
+                        <p>Internship doesn't always happen behind a desk. Here I was in the passenger seat, taking notes, planning the next move, and staying productive while we traveled between locations. I learned that real business runs on flexibility — your office is wherever your laptop opens.</p>
+                    </div>
+                </div>
+
+                <div class="internship-story" onclick="openInternshipLightbox(this)">
+                    <img src="images/Purchasing stock.jpg" alt="Purchasing stock">
+                    <div class="story-content">
+                        <h3>Purchasing Stock</h3>
+                        <p>One of my responsibilities was helping source and select new stock. From scanning shelves to negotiating prices, I got hands-on experience in supply and inventory decisions. It taught me how every product on a shelf is a business decision — what to buy, how much, and at what cost.</p>
+                    </div>
+                </div>
+
+                <div class="internship-story" onclick="openInternshipLightbox(this)">
+                    <img src="images/Dinner.jpg" alt="Dinner">
+                    <div class="story-content">
+                        <h3>Working Dinner</h3>
+                        <p>Not every important meeting happens in a boardroom. Over dinner, we discussed strategy, brainstormed new ideas, and reflected on the day's progress. I learned that some of the best business conversations happen when everyone's relaxed and the food is good.</p>
+                    </div>
+                </div>
+
+                <div class="internship-story" onclick="openInternshipLightbox(this)">
+                    <img src="images/Facebook post to get likes and audience.jpg" alt="Building the audience">
+                    <div class="story-content">
+                        <h3>Building the Audience</h3>
+                        <p>We took a group photo to share on Facebook — content that would help us grow our likes, engagement, and reach. This was my first real lesson in how content marketing isn't just about posting; it's about telling a story your audience wants to be part of.</p>
+                    </div>
+                </div>
+
+                <div class="internship-story" onclick="openInternshipLightbox(this)">
+                    <img src="images/working late at night.jpg" alt="Working late at night">
+                    <div class="story-content">
+                        <h3>Working Late at Night</h3>
+                        <p>Long after the office would normally close, we were still at it — laptops open, ideas flowing. These late-night sessions showed me what dedication really looks like. When you care about the work, the clock stops mattering.</p>
+                    </div>
+                </div>
+
+                <div class="internship-story" onclick="openInternshipLightbox(this)">
+                    <img src="images/on the road to germany.jpg" alt="On the road to Germany">
+                    <div class="story-content">
+                        <h3>On the Road to Germany</h3>
+                        <p>Cross-border business is a different beast. Driving to Germany taught me about logistics, planning, and the small details that make international work happen. The view from the window was a constant reminder: opportunity is always one road trip away.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="internshipLightbox" onclick="closeInternshipLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="internshipLightboxImg" src="" alt="Full size">
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 BigB. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function openInternshipLightbox(item) {
+            const img = item.querySelector('img');
+            document.getElementById('internshipLightboxImg').src = img.src;
+            document.getElementById('internshipLightbox').classList.add('active');
+        }
+
+        function closeInternshipLightbox() {
+            document.getElementById('internshipLightbox').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeInternshipLightbox();
+        });
+    </script>
+</body>
+</html>

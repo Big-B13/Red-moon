@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// ── Red Moon · Storage rules (OPTIONAL — not used right now) ─────
+// The archive currently uses a link vault (YouTube/Drive) because new
+// free-plan projects can't create a Storage bucket. Only deploy these
+// if you ever upgrade the project to Blaze and want real uploads.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isArchivist() {
+      return request.auth != null
+        && request.auth.uid in [
+          'PASTE_YOUR_UID_HERE'
+          // , 'OPTIONAL_SECOND_UID_HERE'
+        ];
+    }
+
+    match /archive/{uid}/{file=**} {
+      allow read, write: if isArchivist() && request.auth.uid == uid;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,751 @@
+/* === BigB Theme === */
+.bigb-page {
+    background: #0a0a0a;
+    color: #fff;
+}
+
+.bigb-nav {
+    background: #000;
+    border-bottom: 2px solid #00ff88;
+}
+
+.bigb-logo {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #00ff88, #00ccff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+}
+
+.bigb-projects-hero {
+    text-align: center;
+    padding: 100px 20px 60px;
+    background: radial-gradient(circle at center, rgba(0, 255, 136, 0.1), transparent 70%);
+    border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.bigb-hero-title {
+    font-size: 6rem;
+    font-weight: 900;
+    letter-spacing: 8px;
+    margin: 0;
+    background: linear-gradient(135deg, #00ff88, #00ccff, #ff00aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.4));
+    }
+
+    to {
+        filter: drop-shadow(0 0 40px rgba(0, 204, 255, 0.6));
+    }
+}
+
+.bigb-hero-subtitle {
+    font-size: 1.5rem;
+    color: #00ff88;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin: 10px 0 30px;
+}
+
+.bigb-intro-text {
+    max-width: 700px;
+    margin: 0 auto;
+    color: #ccc;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.bigb-section-title {
+    font-size: 2rem;
+    color: #00ff88;
+    letter-spacing: 3px;
+    margin: 60px 0 40px;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+}
+
+.bigb-item {
+    background: #111;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    overflow: hidden;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+    .bigb-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 0;
+        background: linear-gradient(180deg, #00ff88, #00ccff);
+        transition: height 0.4s ease;
+    }
+
+    .bigb-item:hover {
+        transform: translateY(-8px);
+        border-color: #00ff88;
+        box-shadow: 0 20px 50px rgba(0, 255, 136, 0.2);
+    }
+
+        .bigb-item:hover::before {
+            height: 100%;
+        }
+
+.bigb-tag {
+    display: inline-block;
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.bigb-play {
+    background: rgba(0, 255, 136, 0.9) !important;
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+}
+
+.bigb-btn {
+    background: transparent !important;
+    color: #00ff88 !important;
+    border: 2px solid #00ff88 !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+    .bigb-btn:hover {
+        background: #00ff88 !important;
+        color: #000 !important;
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+    }
+
+.bigb-footer {
+    background: #000;
+    border-top: 2px solid #00ff88;
+    text-align: center;
+    padding: 30px;
+    color: #888;
+    letter-spacing: 2px;
+}
+/* === About BigB Page Blocks === */
+.bigb-about-block {
+    max-width: 800px;
+    margin: 0 auto 60px;
+    padding: 40px;
+    background: #111;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-left: 4px solid #00ff88;
+    transition: all 0.4s ease;
+}
+
+    .bigb-about-block:hover {
+        border-color: #00ff88;
+        box-shadow: 0 10px 40px rgba(0, 255, 136, 0.15);
+        transform: translateX(5px);
+    }
+
+.bigb-block-title {
+    color: #fff;
+    font-size: 2rem;
+    margin: 10px 0 20px;
+    letter-spacing: 1px;
+}
+
+.bigb-block-text {
+    color: #ccc;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+/* List */
+.bigb-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .bigb-list li {
+        color: #ddd;
+        font-size: 1.1rem;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.3s ease;
+    }
+
+        .bigb-list li:last-child {
+            border-bottom: none;
+        }
+
+        .bigb-list li:hover {
+            color: #00ff88;
+            padding-left: 10px;
+        }
+
+.bigb-bullet {
+    color: #00ff88;
+    font-weight: bold;
+    font-size: 1.3rem;
+    font-family: 'Courier New', monospace;
+}
+
+/* CTA */
+.bigb-cta {
+    text-align: center;
+    margin: 80px 0 40px;
+}
+
+    .bigb-cta .bigb-btn {
+        display: inline-block;
+        padding: 18px 40px;
+        font-size: 1.1rem;
+    }
+/* === BigB Contact Page === */
+
+/* Contact Cards Grid */
+.bigb-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 80px;
+}
+
+.bigb-contact-card {
+    background: #111;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-left: 4px solid #00ff88;
+    padding: 30px;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.4s ease;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+    .bigb-contact-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.08), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .bigb-contact-card:hover::before {
+        left: 100%;
+    }
+
+    .bigb-contact-card:hover {
+        transform: translateY(-8px);
+        border-color: #00ff88;
+        box-shadow: 0 15px 40px rgba(0, 255, 136, 0.2);
+    }
+
+.bigb-contact-icon {
+    width: 50px;
+    height: 50px;
+    color: #00ff88;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
+}
+
+    .bigb-contact-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+
+.bigb-contact-card h3 {
+    color: #fff;
+    font-size: 1.4rem;
+    margin: 10px 0 8px;
+}
+
+.bigb-contact-card p {
+    color: #aaa;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Contact Form */
+.bigb-form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #111;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-left: 4px solid #00ff88;
+    padding: 50px;
+}
+
+.bigb-form-group {
+    margin-bottom: 25px;
+}
+
+    .bigb-form-group label {
+        display: block;
+        color: #00ff88;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .bigb-form-group input,
+    .bigb-form-group select,
+    .bigb-form-group textarea {
+        width: 100%;
+        background: #0a0a0a;
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        color: #fff;
+        padding: 14px 18px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+        .bigb-form-group input:focus,
+        .bigb-form-group select:focus,
+        .bigb-form-group textarea:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            background: #000;
+        }
+
+        .bigb-form-group input::placeholder,
+        .bigb-form-group textarea::placeholder {
+            color: #555;
+        }
+
+    .bigb-form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+
+    .bigb-form-group select {
+        cursor: pointer;
+    }
+
+.bigb-form button {
+    width: 100%;
+    padding: 18px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+/* === Poetry Page === */
+
+/* Grid container — wraps all poems */
+.bigb-projects-section .container > .poem-card {
+    /* This rule will be overridden by the grid below */
+}
+
+/* Add this wrapper class instead */
+.poem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns side by side */
+    gap: 30px;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+/* Poem card itself */
+/* === Poetry Page === */
+
+/* Grid container */
+.poem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* exactly 3 columns */
+    gap: 30px;
+    margin: 0 auto;
+    max-width: 1200px;
+    align-items: start; /* ← KEY: poems don't stretch to match height */
+}
+
+/* Poem card */
+.poem-card {
+    background: #111;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-left: 4px solid #00ff88;
+    padding: 40px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    /* If a poem is very long, limit its height and let it scroll */
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+    /* Custom scrollbar for long poems */
+    .poem-card::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .poem-card::-webkit-scrollbar-track {
+        background: #0a0a0a;
+    }
+
+    .poem-card::-webkit-scrollbar-thumb {
+        background: #00ff88;
+        border-radius: 3px;
+    }
+
+    .poem-card:hover {
+        border-color: #00ff88;
+        box-shadow: 0 15px 50px rgba(0, 255, 136, 0.15);
+        transform: translateY(-5px);
+    }
+
+.poem-header {
+    border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.poem-title {
+    color: #fff;
+    font-size: 1.8rem;
+    margin: 10px 0 8px;
+    letter-spacing: 1px;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+}
+
+.poem-date {
+    color: #666;
+    font-size: 0.85rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* Poem text — clean and readable */
+.poem-text {
+    color: #ddd;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 1.05rem;
+    line-height: 1.9;
+    white-space: pre-line; /* respects line breaks but ignores indentation */
+    margin: 0;
+    background: transparent;
+    padding: 0;
+    border: none;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+    .poem-text::first-letter {
+        color: #00ff88;
+        font-size: 1.3em;
+        font-weight: bold;
+    }
+
+/* Stack on smaller screens */
+@media (max-width: 900px) {
+    .poem-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .poem-card {
+        max-height: none; /* full height on mobile */
+    }
+}
+
+/* Responsive — stack on smaller screens */
+@media (max-width: 900px) {
+    .poem-grid {
+        grid-template-columns: 1fr; /* 1 column on tablet/mobile */
+    }
+}
+
+/* === Gallery Page === */
+
+/* Masonry-style grid */
+.gallery-grid {
+    column-count: 3;
+    column-gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .gallery-grid {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 600px) {
+    .gallery-grid {
+        column-count: 1;
+    }
+}
+
+/* Each photo */
+.gallery-item {
+    position: relative;
+    break-inside: avoid;
+    margin-bottom: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    transition: all 0.4s ease;
+}
+
+    .gallery-item img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.5s ease;
+    }
+
+    .gallery-item:hover {
+        border-color: #00ff88;
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        transform: translateY(-5px);
+    }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+/* Caption overlay */
+.gallery-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+.gallery-caption {
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* === Lightbox (Full-Size View) === */
+.lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    cursor: pointer;
+    animation: fadeInLightbox 0.3s ease;
+}
+
+    .lightbox.active {
+        display: flex;
+    }
+
+@keyframes fadeInLightbox {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.lightbox img {
+    max-width: 90%;
+    max-height: 85vh;
+    object-fit: contain;
+    border: 2px solid #00ff88;
+    box-shadow: 0 0 50px rgba(0, 255, 136, 0.4);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    color: #00ff88;
+    font-size: 3rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    line-height: 1;
+}
+
+    .lightbox-close:hover {
+        transform: scale(1.2) rotate(90deg);
+    }
+
+#lightbox-caption {
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    margin-top: 20px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+/* ========== BIGB MOBILE RESPONSIVE ========== */
+@media (max-width: 768px) {
+    /* Navigation */
+    .bigb-logo {
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+    }
+
+    nav .container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .nav-links {
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+        .nav-links a {
+            font-size: 0.9rem;
+        }
+
+    /* Hero Section */
+    .bigb-projects-hero {
+        padding: 60px 20px 40px;
+    }
+
+    .bigb-hero-title {
+        font-size: 3rem;
+        letter-spacing: 4px;
+    }
+
+    .bigb-hero-subtitle {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+
+    .bigb-intro-text {
+        font-size: 1rem;
+    }
+
+    /* BigB Main Hero (bigb.html landing) */
+    .bigb-title {
+        font-size: 4rem;
+        letter-spacing: -2px;
+    }
+
+    .bigb-tagline {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+
+    .bigb-hero {
+        padding: 60px 20px 40px;
+    }
+
+    /* Section Titles */
+    .bigb-section-title {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+        margin: 40px 0 25px;
+        text-align: center;
+    }
+
+    /* About Blocks */
+    .bigb-about-block {
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .bigb-block-title {
+        font-size: 1.4rem;
+    }
+
+    .bigb-block-text,
+    .bigb-list li {
+        font-size: 1rem;
+    }
+
+    /* Contact Form */
+    .bigb-form-container {
+        padding: 25px;
+    }
+
+    .bigb-contact-card {
+        padding: 20px;
+    }
+
+    /* Poems */
+    .poem-card {
+        padding: 25px;
+        max-height: none;
+    }
+
+    .poem-title {
+        font-size: 1.4rem;
+    }
+
+    .poem-text {
+        font-size: 1rem;
+    }
+
+    /* CTA Button */
+    .bigb-cta .bigb-btn {
+        padding: 14px 30px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .bigb-hero-title {
+        font-size: 2.3rem;
+        letter-spacing: 2px;
+    }
+
+    .bigb-title {
+        font-size: 3rem;
+    }
+
+    .nav-links {
+        gap: 0.5rem;
+    }
+
+        .nav-links a {
+            font-size: 0.85rem;
+        }
+
+    .bigb-logo {
+        font-size: 1.2rem;
+    }
+}

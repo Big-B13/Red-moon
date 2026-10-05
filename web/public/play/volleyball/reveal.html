@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Big Reveal 🏐</title>
+<link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<div id="conn" class="connection-indicator offline">connecting…</div>
+<div class="container">
+  <nav style="display:flex; gap:12px; justify-content:center; margin-bottom:24px; flex-wrap:wrap;">
+    <a href="./index.html" style="color:#cbd5e1; text-decoration:none; padding:8px 16px; border-radius:6px; background:rgba(30,41,59,0.6); font-size:0.9rem;">🏠 Home</a>
+    <a href="./league.html" style="color:#cbd5e1; text-decoration:none; padding:8px 16px; border-radius:6px; background:rgba(30,41,59,0.6); font-size:0.9rem;">🏆 League</a>
+    <a href="./clubs.html" style="color:#cbd5e1; text-decoration:none; padding:8px 16px; border-radius:6px; background:rgba(30,41,59,0.6); font-size:0.9rem;">🛡️ Clubs</a>
+  </nav>
+
+  <h1><span class="emoji">🎬</span> THE BIG REVEAL</h1>
+  <p class="tagline">Time to see who each captain actually drafted.</p>
+
+  <div id="loading" class="card">
+    <h2>Loading final results…</h2>
+  </div>
+
+  <div id="reveal-teams"></div>
+
+  <div class="row-btns">
+    <a href="./index.html"><button class="secondary">← Home</button></a>
+    <button onclick="exportResults()">📤 Export results (text)</button>
+    <button onclick="window.print()">🖨️ Print / Save PDF</button>
+  </div>
+</div>
+
+<script type="module" src="./js/reveal.js"></script>
+</body>
+</html>

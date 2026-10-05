@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: #0a0a0a;
+}
+
+@layer utilities {
+  /* Public identity — the neon gradient from the original portfolio */
+  .text-gradient {
+    background: linear-gradient(135deg, #00ff88, #00ccff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  /* Hidden identity — Red Moon */
+  .text-gradient-red {
+    background: linear-gradient(135deg, #ff5e4d, #ff2d78);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .glow-neon {
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.15);
+  }
+  .glow-red {
+    box-shadow: 0 0 40px rgba(255, 59, 48, 0.18);
+  }
+}
+
+::selection {
+  background: rgba(0, 255, 136, 0.25);
+}
